@@ -4,285 +4,62 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Storm Chronicles V3 — Six Mission Runtime</title>
-
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-html,body{
-  margin:0;
-  background:#06152b;
-  color:#effaff;
-  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
-  overflow:hidden;
-  touch-action:none;
-}
-canvas{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100dvh;
-}
-#hud{
-  position:fixed;
-  z-index:2;
-  inset:0;
-  pointer-events:none;
-  padding:max(8px,env(safe-area-inset-top))
-          9px
-          max(10px,env(safe-area-inset-bottom));
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.row{
-  display:flex;
-  justify-content:space-between;
-  gap:7px;
-}
-.card{
-  padding:7px 9px;
-  border-radius:10px;
-  background:#061b33dc;
-  border:1px solid #82eaff75;
-  box-shadow:0 2px 12px #0008;
-  backdrop-filter:blur(6px);
-}
-.title{
-  font-size:10px;
-  font-weight:900;
-  color:#a8efff;
-  letter-spacing:1px;
-}
-.tiny{
-  font-size:10px;
-  line-height:1.35;
-}
-.bar{
-  width:min(42vw,175px);
-  height:6px;
-  border-radius:99px;
-  background:#142b48;
-  overflow:hidden;
-  margin:2px 0 4px;
-}
-.bar i{
-  display:block;
-  height:100%;
-  background:linear-gradient(90deg,#ff5f79,#ffb06f);
-}
-.energy i{
-  background:linear-gradient(90deg,#45e8e9,#8e8eff);
-}
-#obj{
-  align-self:center;
-  max-width:94vw;
-  text-align:center;
-}
-.hint{
-  margin-top:auto;
-  align-self:center;
-  max-width:93vw;
-  text-align:center;
-}
-.right{text-align:right}
-.green{color:#8effcd}
-.amber{color:#ffd07a}
-
-#controls{
-  position:fixed;
-  z-index:4;
-  inset:0;
-  pointer-events:none;
-}
-.stick{
-  position:absolute;
-  left:max(14px,env(safe-area-inset-left));
-  bottom:max(14px,calc(env(safe-area-inset-bottom) + 4px));
-  width:126px;
-  height:126px;
-  border-radius:50%;
-  background:#0c315d88;
-  border:1px solid #93edff75;
-  pointer-events:auto;
-}
-.knob{
-  position:absolute;
-  left:38px;
-  top:38px;
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:#52dbe889;
-  border:2px solid #d0faff99;
-}
-.acts{
-  position:absolute;
-  right:max(10px,env(safe-area-inset-right));
-  bottom:max(11px,calc(env(safe-area-inset-bottom) + 4px));
-  width:198px;
-  height:183px;
-  pointer-events:none;
-}
-.btn{
-  position:absolute;
-  border:2px solid #d2f8ff99;
-  border-radius:50%;
-  color:#fff;
-  font-weight:900;
-  font-size:10px;
-  background:#2367a9d9;
-  box-shadow:0 3px 14px #0009;
-  pointer-events:auto;
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;background:#06152b;color:#effaff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100dvh}
+#hud{position:fixed;z-index:2;inset:0;pointer-events:none;padding:max(8px,env(safe-area-inset-top)) 9px max(10px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+.row{display:flex;justify-content:space-between;gap:7px}
+.card{padding:7px 9px;border-radius:10px;background:#061b33dc;border:1px solid #82eaff75;box-shadow:0 2px 12px #0008;backdrop-filter:blur(6px)}
+.title{font-size:10px;font-weight:900;color:#a8efff;letter-spacing:1px}
+.tiny{font-size:10px;line-height:1.35}
+.bar{width:min(42vw,175px);height:6px;border-radius:99px;background:#142b48;overflow:hidden;margin:2px 0 4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff5f79,#ffb06f)}
+.energy i{background:linear-gradient(90deg,#45e8e9,#8e8eff)}
+#obj{align-self:center;max-width:94vw;text-align:center}
+.hint{margin-top:auto;align-self:center;max-width:93vw;text-align:center}
+.right{text-align:right}.green{color:#8effcd}.amber{color:#ffd07a}
+#controls{position:fixed;z-index:4;inset:0;pointer-events:none}
+.stick{position:absolute;left:max(14px,env(safe-area-inset-left));bottom:max(14px,calc(env(safe-area-inset-bottom) + 4px));width:126px;height:126px;border-radius:50%;background:#0c315d88;border:1px solid #93edff75;pointer-events:auto}
+.knob{position:absolute;left:38px;top:38px;width:50px;height:50px;border-radius:50%;background:#52dbe889;border:2px solid #d0faff99}
+.acts{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(11px,calc(env(safe-area-inset-bottom) + 4px));width:198px;height:183px;pointer-events:none}
+.btn{position:absolute;border:2px solid #d2f8ff99;border-radius:50%;color:#fff;font-weight:900;font-size:10px;background:#2367a9d9;box-shadow:0 3px 14px #0009;pointer-events:auto}
 .btn:active{transform:scale(.91)}
-#atk{
-  width:70px;
-  height:70px;
-  right:0;
-  bottom:0;
-  background:#3583cddd;
-}
-#dash{
-  width:52px;
-  height:52px;
-  right:75px;
-  bottom:4px;
-}
-#tech{
-  width:56px;
-  height:56px;
-  right:2px;
-  bottom:80px;
-  background:#9363d5dd;
-}
-#menu{
-  position:absolute;
-  top:max(7px,env(safe-area-inset-top));
-  right:max(7px,env(safe-area-inset-right));
-  width:35px;
-  height:35px;
-  border-radius:50%;
-  border:1px solid #a8f2ff;
-  background:#092d55;
-  color:#fff;
-  font-weight:900;
-  pointer-events:auto;
-}
-
-.modal{
-  position:fixed;
-  z-index:20;
-  inset:0;
-  background:#020914df;
-  padding:15px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  pointer-events:auto;
-}
+#atk{width:70px;height:70px;right:0;bottom:0;background:#3583cddd}
+#dash{width:52px;height:52px;right:75px;bottom:4px}
+#tech{width:56px;height:56px;right:2px;bottom:80px;background:#9363d5dd}
+#menu{position:absolute;top:max(7px,env(safe-area-inset-top));right:max(7px,env(safe-area-inset-right));width:35px;height:35px;border-radius:50%;border:1px solid #a8f2ff;background:#092d55;color:#fff;font-weight:900;pointer-events:auto}
+.modal{position:fixed;z-index:20;inset:0;background:#020914df;padding:15px;display:none;align-items:center;justify-content:center;pointer-events:auto}
 .modal.show{display:flex}
-.panel{
-  width:min(530px,100%);
-  max-height:86dvh;
-  overflow:auto;
-  border:1px solid #97edff;
-  background:#092643;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:0 7px 38px #000;
-}
-.panel h2{
-  margin:0 0 8px;
-  color:#b8f4ff;
-  font-size:18px;
-}
-.panel p{
-  font-size:13px;
-  line-height:1.45;
-}
-.panel button{
-  border:1px solid #a6f0ff;
-  border-radius:9px;
-  padding:9px 11px;
-  color:#fff;
-  font-weight:800;
-  background:#197bbd;
-  margin:4px 3px 0 0;
-}
-.panel button.alt{background:#553c86}
-.panel button.danger{background:#9b3047}
-.node{
-  font-size:12px;
-  padding:8px;
-  border:1px solid #78dcff66;
-  border-radius:8px;
-  margin:6px 0;
-}
-.node.on{
-  border-color:#87ffd0;
-  background:#157a6144;
-}
-.node.lock{
-  border-color:#ffc96c66;
-  color:#d9dce2;
-}
-.desktop{
-  position:fixed;
-  bottom:4px;
-  left:8px;
-  color:#d3e5ed88;
-  font-size:9px;
-  pointer-events:none;
-}
-@media(max-width:390px){
-  .right{display:none}
-  .bar{width:142px}
-  .stick{
-    transform:scale(.88);
-    transform-origin:bottom left;
-  }
-  .acts{
-    transform:scale(.88);
-    transform-origin:bottom right;
-  }
-  .hint{font-size:9px}
-}
-@media(orientation:landscape) and (max-height:560px){
-  .hint{display:none}
-}
+.panel{width:min(540px,100%);max-height:88dvh;overflow:auto;border:1px solid #97edff;background:#092643;border-radius:14px;padding:16px;box-shadow:0 7px 38px #000}
+.panel h2{margin:0 0 8px;color:#b8f4ff;font-size:18px}
+.panel p{font-size:13px;line-height:1.45}
+.panel button{border:1px solid #a6f0ff;border-radius:9px;padding:9px 11px;color:#fff;font-weight:800;background:#197bbd;margin:4px 3px 0 0}
+.panel button.alt{background:#553c86}.panel button.danger{background:#9b3047}
+.node{font-size:12px;padding:8px;border:1px solid #78dcff66;border-radius:8px;margin:6px 0}
+.node.on{border-color:#87ffd0;background:#157a6144}
+.node.lock{border-color:#ffc96c66;color:#d9dce2}
+.desktop{position:fixed;bottom:4px;left:8px;color:#d3e5ed88;font-size:9px;pointer-events:none}
+@media(max-width:390px){.right{display:none}.bar{width:142px}.stick{transform:scale(.88);transform-origin:bottom left}.acts{transform:scale(.88);transform-origin:bottom right}.hint{font-size:9px}}
+@media(orientation:landscape) and (max-height:560px){.hint{display:none}}
 </style>
 </head>
 
 <body>
-
 <canvas id="game"></canvas>
 
 <div id="hud">
-
   <div class="row">
-
     <div class="card">
       <div class="title">STORM CHRONICLES · V3</div>
-
       <div class="tiny">
-        LV <b id="lv">1</b>
-        · PWR <b id="pw">10</b>
-        · XP <b id="xp">0</b>/<b id="need">250</b>
-        · TP <b id="tp">0</b>
+        LV <b id="lv">1</b> · PWR <b id="pw">10</b> ·
+        XP <b id="xp">0</b>/<b id="need">250</b> · TP <b id="tp">0</b>
       </div>
-
       <div class="tiny">HP <span id="hpt">100</span></div>
-      <div class="bar">
-        <i id="hp" style="width:100%"></i>
-      </div>
-
+      <div class="bar"><i id="hp" style="width:100%"></i></div>
       <div class="tiny">ENERGY <span id="ent">100</span></div>
-      <div class="bar energy">
-        <i id="en" style="width:100%"></i>
-      </div>
+      <div class="bar energy"><i id="en" style="width:100%"></i></div>
     </div>
 
     <div class="card tiny right">
@@ -291,7 +68,6 @@ canvas{
       <span id="phase">READY</span><br>
       <span id="stat">—</span>
     </div>
-
   </div>
 
   <div id="obj" class="card tiny">
@@ -301,27 +77,20 @@ canvas{
   <div class="card tiny hint">
     Left pad move · ATK bolt · DASH · TECH Storm technique
   </div>
-
 </div>
 
 <div id="controls">
-
-  <div id="stick" class="stick">
-    <div id="knob" class="knob"></div>
-  </div>
-
+  <div id="stick" class="stick"><div id="knob" class="knob"></div></div>
   <div class="acts">
     <button id="atk" class="btn">ATK</button>
     <button id="dash" class="btn">DASH</button>
     <button id="tech" class="btn">TECH</button>
   </div>
-
   <button id="menu">☰</button>
-
 </div>
 
 <div class="desktop">
-  WASD/arrows move · Space attack · Shift dash · 1–6 select technique · E interact
+  WASD/arrows move · Space attack · Shift dash · 1–6 technique · E interact
 </div>
 
 <div id="modal" class="modal">
@@ -335,883 +104,405 @@ canvas{
 /* ============================================================
    STORM CHRONICLES V3
    ============================================================
-   ARCHITECTURAL INVARIANT
-
-   INPUT
-      ↓
-   REQUEST
+   COMMAND
       ↓
    VALIDATION
       ↓
    T-ENGINE
       ↓
-   IMMUTABLE RESULT
+   AUTHORITATIVE RESULT
       ↓
    EVENT BUS
       ↓
-   AUTHORIZED CONSUMERS
+   CONSUMERS
       ↓
-   VALIDATED SNAPSHOT
-      ↓
-   RECONSTRUCTION
-      ↓
-   T-ENGINE
+   VALIDATED SAVE
    ============================================================ */
 
+const SAVE_KEY="stormChroniclesCampaignV3_1";
+
+const TECHNIQUES={
+  pressureBurst:{
+    id:"pressureBurst",name:"Pressure Burst",force:"Pressure",
+    cost:25,cooldown:.65,handlerId:"pressureBurst",
+    role:"Create space and break enemy groups.",
+    discovery:"Valley Gate",drill:"pressureCircle"
+  },
+  airStep:{
+    id:"airStep",name:"Air Step",force:"Wind",
+    cost:18,cooldown:.35,handlerId:"airStep",
+    role:"Cross broken terrain and reposition in the air.",
+    discovery:"Forest Pursuit",drill:"airStepLane"
+  },
+  vortex:{
+    id:"vortex",name:"Vortex",force:"Rotation",
+    cost:30,cooldown:.8,handlerId:"vortex",
+    role:"Pull scattered enemies together.",
+    discovery:"Mountain Pass",drill:"vortexCluster"
+  },
+  spiralGuard:{
+    id:"spiralGuard",name:"Spiral Guard",force:"Rotation",
+    cost:16,cooldown:.45,handlerId:"spiralGuard",
+    role:"Deflect projectiles and pressure attackers.",
+    discovery:"Ancient Ruins",drill:"guardVolley"
+  },
+  turbulence:{
+    id:"turbulence",name:"Turbulence",force:"Turbulence",
+    cost:23,cooldown:1,handlerId:"turbulence",
+    role:"Disrupt unstable enemies and hazards.",
+    discovery:"Storm Core",drill:"turbulenceField"
+  },
+  tempest:{
+    id:"tempest",name:"Tempest",force:"Synthesis",
+    cost:42,cooldown:1.4,handlerId:"tempest",
+    role:"Combine Wind, Pressure, Rotation and Turbulence.",
+    discovery:"Tempest Citadel",drill:"tempestChain"
+  }
+};
+
+const REGIONS={
+  valley:{title:"Valley Gate",palette:["#0c405a","#071827"]},
+  forest:{title:"Forest Pursuit",palette:["#245b42","#081d1b"]},
+  mountain:{title:"Mountain Pass",palette:["#536274","#151d2c"]},
+  ruins:{title:"Ancient Ruins",palette:["#604936","#211922"]},
+  stormCore:{title:"Storm Core",palette:["#43386e","#111329"]},
+  citadel:{title:"Tempest Citadel",palette:["#49376b","#101329"]}
+};
+
+const ENEMIES={
+  raider:{id:"raider",name:"Raider",hp:38,speed:48,damage:7,stability:45,color:"#bd8cff",ranged:false},
+  hunter:{id:"hunter",name:"Forest Hunter",hp:42,speed:60,damage:6,stability:30,color:"#80dbff",ranged:true},
+  guardian:{id:"guardian",name:"Mountain Guardian",hp:86,speed:29,damage:13,stability:110,color:"#d6a65d",ranged:false},
+  mage:{id:"mage",name:"Ruin Adept",hp:46,speed:36,damage:7,stability:28,color:"#ff7db5",ranged:true},
+  entity:{id:"entity",name:"Storm Sentinel",hp:58,speed:49,damage:9,stability:58,color:"#8dffce",ranged:true},
+  elite:{id:"elite",name:"Citadel Elite",hp:74,speed:52,damage:11,stability:82,color:"#ff916a",ranged:false}
+};
 
 /* ============================================================
-   CONTENT
+   CONTENT — missions are data, not runtime logic
    ============================================================ */
 
-const SAVE_KEY = "stormChroniclesCampaignV3";
-
-const TECHNIQUES = {
-
-  pressureBurst:{
-    id:"pressureBurst",
-    name:"Pressure Burst",
-    force:"Pressure",
-    cost:25,
-    cooldown:.65,
-    handlerId:"pressureBurst",
-    role:"Create space and break enemy groups.",
-    discovery:"Valley Gate",
-    drill:"pressureCircle"
-  },
-
-  airStep:{
-    id:"airStep",
-    name:"Air Step",
-    force:"Wind",
-    cost:18,
-    cooldown:.35,
-    handlerId:"airStep",
-    role:"Cross broken terrain and reposition in the air.",
-    discovery:"Forest Pursuit",
-    drill:"airStepLane"
-  },
-
-  vortex:{
-    id:"vortex",
-    name:"Vortex",
-    force:"Rotation",
-    cost:30,
-    cooldown:.8,
-    handlerId:"vortex",
-    role:"Pull scattered enemies together.",
-    discovery:"Mountain Pass",
-    drill:"vortexCluster"
-  },
-
-  spiralGuard:{
-    id:"spiralGuard",
-    name:"Spiral Guard",
-    force:"Rotation",
-    cost:16,
-    cooldown:.45,
-    handlerId:"spiralGuard",
-    role:"Deflect projectiles and pressure attackers.",
-    discovery:"Ancient Ruins",
-    drill:"guardVolley"
-  },
-
-  turbulence:{
-    id:"turbulence",
-    name:"Turbulence",
-    force:"Turbulence",
-    cost:23,
-    cooldown:1.0,
-    handlerId:"turbulence",
-    role:"Disrupt unstable enemies and hazards.",
-    discovery:"Storm Core",
-    drill:"turbulenceField"
-  },
-
-  tempest:{
-    id:"tempest",
-    name:"Tempest",
-    force:"Synthesis",
-    cost:42,
-    cooldown:1.4,
-    handlerId:"tempest",
-    role:"Combine Wind, Pressure, Rotation and Turbulence.",
-    discovery:"Tempest Citadel",
-    drill:"tempestChain"
-  }
-
-};
-
-
-/* Generic region definitions */
-
-const REGIONS = {
-
-  valley:{
-    id:"valley",
-    title:"Valley Gate",
-    palette:["#0c405a","#071827"]
-  },
-
-  forest:{
-    id:"forest",
-    title:"Forest Pursuit",
-    palette:["#245b42","#081d1b"]
-  },
-
-  mountain:{
-    id:"mountain",
-    title:"Mountain Pass",
-    palette:["#536274","#151d2c"]
-  },
-
-  ruins:{
-    id:"ruins",
-    title:"Ancient Ruins",
-    palette:["#604936","#211922"]
-  },
-
-  stormCore:{
-    id:"stormCore",
-    title:"Storm Core",
-    palette:["#43386e","#111329"]
-  },
-
-  citadel:{
-    id:"citadel",
-    title:"Tempest Citadel",
-    palette:["#49376b","#101329"]
-  }
-
-};
-
-
-/* Generic enemy definitions */
-
-const ENEMIES = {
-
-  raider:{
-    id:"raider",
-    name:"Raider",
-    hp:38,
-    speed:48,
-    damage:7,
-    stability:45,
-    color:"#bd8cff",
-    ranged:false
-  },
-
-  hunter:{
-    id:"hunter",
-    name:"Forest Hunter",
-    hp:42,
-    speed:60,
-    damage:6,
-    stability:30,
-    color:"#80dbff",
-    ranged:true
-  },
-
-  guardian:{
-    id:"guardian",
-    name:"Mountain Guardian",
-    hp:86,
-    speed:29,
-    damage:13,
-    stability:110,
-    color:"#d6a65d",
-    ranged:false
-  },
-
-  mage:{
-    id:"mage",
-    name:"Ruin Adept",
-    hp:46,
-    speed:36,
-    damage:7,
-    stability:28,
-    color:"#ff7db5",
-    ranged:true
-  },
-
-  entity:{
-    id:"entity",
-    name:"Storm Sentinel",
-    hp:58,
-    speed:49,
-    damage:9,
-    stability:58,
-    color:"#8dffce",
-    ranged:true
-  },
-
-  elite:{
-    id:"elite",
-    name:"Citadel Elite",
-    hp:74,
-    speed:52,
-    damage:11,
-    stability:82,
-    color:"#ff916a",
-    ranged:false
-  }
-
-};
-
-
-/*
- Mission definitions are content.
-
- They do not contain movement or combat implementations.
-*/
-
-const MISSIONS = {
-
+const MISSIONS={
   valleyGate:{
-    id:"valleyGate",
-    number:1,
-    title:"Valley Gate",
-    regionId:"valley",
+    id:"valleyGate",number:1,title:"Valley Gate",regionId:"valley",
     problem:"Too many enemies control the route.",
-    rewardXP:250,
-    rewardTP:1,
-    techniqueRewardId:"pressureBurst",
-
+    reward:{xp:250,tp:1},techniqueReward:null,
     phases:{
-      forest:{
-        objective:"Reach the Valley Gate.",
-        next:"raiders"
-      },
-
-      raiders:{
-        objective:"Defeat 6 Raiders.",
-        enemyType:"raider",
-        enemyCount:6,
-        next:"captain"
-      },
-
-      captain:{
-        objective:"Defeat the Raider Captain.",
-        bossType:"raider",
-        bossName:"Raider Captain",
-        next:"return"
-      },
-
-      return:{
-        objective:"Cross the west return route.",
-        returnGate:"west",
-        next:"completed"
-      },
-
-      completed:{
-        objective:"Return to the Dojo."
-      }
+      approach:{objective:"Reach the Valley Gate.",type:"travel",next:"raiders"},
+      raiders:{objective:"Defeat 6 Raiders.",type:"enemyWave",enemyType:"raider",enemyCount:6,next:"captain"},
+      captain:{objective:"Defeat the Raider Captain.",type:"boss",bossType:"raider",bossName:"Raider Captain",next:"return"},
+      return:{objective:"Cross the west return route.",type:"returnGate",gate:"west",next:"completed"},
+      completed:{objective:"Return to the Dojo.",type:"complete"}
     }
   },
-
 
   forestPursuit:{
-    id:"forestPursuit",
-    number:2,
-    title:"Forest Pursuit",
-    regionId:"forest",
+    id:"forestPursuit",number:2,title:"Forest Pursuit",regionId:"forest",
     problem:"Broken terrain separates you from the target.",
-    rewardXP:300,
-    rewardTP:1,
-    techniqueRewardId:"airStep",
-
+    reward:{xp:300,tp:1},techniqueReward:"airStep",
     phases:{
-      trail:{
-        objective:"Follow the forest trail.",
-        next:"bridge"
-      },
-
-      bridge:{
-        objective:"Reach the broken bridge.",
-        discovery:"airStep",
-        traversalGate:"brokenBridge",
-        next:"pursuit"
-      },
-
-      pursuit:{
-        objective:"Defeat the Forest Hunters.",
-        enemyType:"hunter",
-        enemyCount:4,
-        next:"boss"
-      },
-
-      boss:{
-        objective:"Defeat the Canopy Stalker.",
-        bossType:"hunter",
-        bossName:"Canopy Stalker",
-        next:"return"
-      },
-
-      return:{
-        objective:"Return through the forest exit.",
-        returnGate:"west",
-        next:"completed"
-      },
-
-      completed:{
-        objective:"Return to the Dojo."
-      }
+      trail:{objective:"Follow the forest trail.",type:"travel",next:"bridge"},
+      bridge:{objective:"Reach the Wind Shrine and learn Air Step.",type:"discovery",technique:"airStep",next:"crossing"},
+      crossing:{objective:"Cross the broken bridge with Air Step.",type:"traversal",gate:"brokenBridge",next:"pursuit"},
+      pursuit:{objective:"Defeat 4 Forest Hunters.",type:"enemyWave",enemyType:"hunter",enemyCount:4,next:"boss"},
+      boss:{objective:"Defeat the Canopy Stalker.",type:"boss",bossType:"hunter",bossName:"Canopy Stalker",next:"return"},
+      return:{objective:"Return through the forest exit.",type:"returnGate",gate:"west",next:"completed"},
+      completed:{objective:"Return to the Dojo.",type:"complete"}
     }
   },
-
 
   mountainPass:{
-    id:"mountainPass",
-    number:3,
-    title:"Mountain Pass",
-    regionId:"mountain",
+    id:"mountainPass",number:3,title:"Mountain Pass",regionId:"mountain",
     problem:"Enemies control the space around you.",
-    rewardXP:400,
-    rewardTP:1,
-    techniqueRewardId:"vortex",
-
+    reward:{xp:400,tp:1},techniqueReward:"vortex",
     phases:{
-      approach:{
-        objective:"Reach the surrounded pass.",
-        next:"surround"
-      },
-
-      surround:{
-        objective:"Survive the surrounding Guardians.",
-        enemyType:"guardian",
-        enemyCount:4,
-        next:"discovery"
-      },
-
-      discovery:{
-        objective:"Activate the Rotation Stone.",
-        discovery:"vortex",
-        next:"trial"
-      },
-
-      trial:{
-        objective:"Break the Guardian formation.",
-        enemyType:"guardian",
-        enemyCount:3,
-        next:"boss"
-      },
-
-      boss:{
-        objective:"Defeat the Mountain Warden.",
-        bossType:"guardian",
-        bossName:"Mountain Warden",
-        next:"return"
-      },
-
-      return:{
-        objective:"Return through the mountain gate.",
-        returnGate:"west",
-        next:"completed"
-      },
-
-      completed:{
-        objective:"Return to the Dojo."
-      }
+      approach:{objective:"Reach the surrounded pass.",type:"travel",next:"surround"},
+      surround:{objective:"Defeat 4 Mountain Guardians.",type:"enemyWave",enemyType:"guardian",enemyCount:4,next:"discovery"},
+      discovery:{objective:"Activate the Rotation Stone and learn Vortex.",type:"discovery",technique:"vortex",next:"trial"},
+      trial:{objective:"Break the Guardian formation.",type:"enemyWave",enemyType:"guardian",enemyCount:3,next:"boss"},
+      boss:{objective:"Defeat the Mountain Warden.",type:"boss",bossType:"guardian",bossName:"Mountain Warden",next:"return"},
+      return:{objective:"Return through the mountain gate.",type:"returnGate",gate:"west",next:"completed"},
+      completed:{objective:"Return to the Dojo.",type:"complete"}
     }
   },
-
 
   ancientRuins:{
-    id:"ancientRuins",
-    number:4,
-    title:"Ancient Ruins",
-    regionId:"ruins",
+    id:"ancientRuins",number:4,title:"Ancient Ruins",regionId:"ruins",
     problem:"Attacks arrive from multiple directions.",
-    rewardXP:500,
-    rewardTP:1,
-    techniqueRewardId:"spiralGuard",
-
+    reward:{xp:500,tp:1},techniqueReward:"spiralGuard",
     phases:{
-      entry:{
-        objective:"Enter the ancient ruins.",
-        next:"volley"
-      },
-
-      volley:{
-        objective:"Survive the projectile hall.",
-        projectileTrial:true,
-        next:"discovery"
-      },
-
-      discovery:{
-        objective:"Reach the Relic and awaken Spiral Guard.",
-        discovery:"spiralGuard",
-        next:"guardian"
-      },
-
-      guardian:{
-        objective:"Defeat the Ruin Sentinel.",
-        bossType:"mage",
-        bossName:"Ruin Sentinel",
-        next:"return"
-      },
-
-      return:{
-        objective:"Leave the ruins through the west route.",
-        returnGate:"west",
-        next:"completed"
-      },
-
-      completed:{
-        objective:"Return to the Dojo."
-      }
+      entry:{objective:"Enter the ancient ruins.",type:"travel",next:"volley"},
+      volley:{objective:"Deflect 6 projectiles in the projectile hall.",type:"projectileTrial",target:6,next:"discovery"},
+      discovery:{objective:"Reach the Relic and learn Spiral Guard.",type:"discovery",technique:"spiralGuard",next:"application"},
+      application:{objective:"Defeat the Ruin Sentinel.",type:"boss",bossType:"mage",bossName:"Ruin Sentinel",next:"return"},
+      return:{objective:"Leave through the west route.",type:"returnGate",gate:"west",next:"completed"},
+      completed:{objective:"Return to the Dojo.",type:"complete"}
     }
   },
-
 
   stormCore:{
-    id:"stormCore",
-    number:5,
-    title:"Storm Core",
-    regionId:"stormCore",
+    id:"stormCore",number:5,title:"Storm Core",regionId:"stormCore",
     problem:"The battlefield itself is unstable.",
-    rewardXP:600,
-    rewardTP:1,
-    techniqueRewardId:"turbulence",
-
+    reward:{xp:600,tp:1},techniqueReward:"turbulence",
     phases:{
-      outer:{
-        objective:"Defeat 5 Storm Sentinels.",
-        enemyType:"entity",
-        enemyCount:5,
-        next:"hazard"
-      },
-
-      hazard:{
-        objective:"Survive the unstable core field.",
-        hazard:true,
-        next:"discovery"
-      },
-
-      discovery:{
-        objective:"Activate the Storm Core and learn Turbulence.",
-        discovery:"turbulence",
-        next:"trial"
-      },
-
-      trial:{
-        objective:"Stabilize the remaining Storm Sentinels.",
-        enemyType:"entity",
-        enemyCount:3,
-        next:"boss"
-      },
-
-      boss:{
-        objective:"Defeat the Core Entity.",
-        bossType:"entity",
-        bossName:"Core Entity",
-        next:"return"
-      },
-
-      return:{
-        objective:"Return through the west core exit.",
-        returnGate:"west",
-        next:"completed"
-      },
-
-      completed:{
-        objective:"Return to the Dojo."
-      }
+      outer:{objective:"Defeat 5 Storm Sentinels.",type:"enemyWave",enemyType:"entity",enemyCount:5,next:"hazard"},
+      hazard:{objective:"Survive the unstable core field.",type:"hazard",duration:8,next:"discovery"},
+      discovery:{objective:"Activate the Storm Core and learn Turbulence.",type:"discovery",technique:"turbulence",next:"trial"},
+      trial:{objective:"Stabilize 3 Storm Sentinels.",type:"enemyWave",enemyType:"entity",enemyCount:3,next:"boss"},
+      boss:{objective:"Defeat the Core Entity.",type:"boss",bossType:"entity",bossName:"Core Entity",next:"return"},
+      return:{objective:"Return through the west core exit.",type:"returnGate",gate:"west",next:"completed"},
+      completed:{objective:"Return to the Dojo.",type:"complete"}
     }
   },
 
-
   tempestCitadel:{
-    id:"tempestCitadel",
-    number:6,
-    title:"Tempest Citadel",
-    regionId:"citadel",
+    id:"tempestCitadel",number:6,title:"Tempest Citadel",regionId:"citadel",
     problem:"Every learned force is being used against you.",
-    rewardXP:1000,
-    rewardTP:2,
-    techniqueRewardId:"tempest",
-
+    reward:{xp:1000,tp:2},techniqueReward:"tempest",
     phases:{
-      approach:{
-        objective:"Enter the Tempest Citadel.",
-        next:"trials"
-      },
-
-      trials:{
-        objective:"Defeat 6 Citadel Guards.",
-        enemyType:"elite",
-        enemyCount:6,
-        next:"discovery"
-      },
-
-      discovery:{
-        objective:"Activate the Storm Altar and learn Tempest.",
-        discovery:"tempest",
-        next:"ascent"
-      },
-
-      ascent:{
-        objective:"Defeat the Citadel Triad.",
-        enemyType:"elite",
-        enemyCount:3,
-        next:"final"
-      },
-
-      final:{
-        objective:"Defeat the Tempest Regent.",
-        bossType:"elite",
-        bossName:"Tempest Regent",
-        next:"ending"
-      },
-
-      ending:{
-        objective:"The Storm has been mastered."
-      }
+      approach:{objective:"Enter the Tempest Citadel.",type:"travel",next:"trials"},
+      trials:{objective:"Defeat 6 Citadel Guards.",type:"enemyWave",enemyType:"elite",enemyCount:6,next:"discovery"},
+      discovery:{objective:"Activate the Storm Altar and learn Tempest.",type:"discovery",technique:"tempest",next:"ascent"},
+      ascent:{objective:"Defeat the Citadel Triad.",type:"enemyWave",enemyType:"elite",enemyCount:3,next:"final"},
+      final:{objective:"Defeat the Tempest Regent.",type:"boss",bossType:"elite",bossName:"Tempest Regent",next:"ending"},
+      ending:{objective:"The Storm has been mastered.",type:"complete"}
     }
   }
-
 };
 
+const MISSION_IDS=Object.keys(MISSIONS);
 
-/* ============================================================
-   SAVE DEFAULTS
-   ============================================================ */
-
-function makeMissionState(status){
+function missionState(status="locked"){
   return {
     status,
     phase:status==="available"?"available":"locked",
     progress:0,
-    bossDefeated:false,
+    phaseTimer:0,
     discovery:false,
+    bossDefeated:false,
     rewardApplied:false,
-    checkpoint:null
+    checkpoint:null,
+    deflections:0
   };
 }
 
-const DEFAULT_SAVE = {
-  version:3,
-
+const DEFAULT_SAVE={
+  version:4,
   player:{
-    level:1,
-    xp:0,
-    power:10,
-    tp:0,
-
+    level:1,xp:0,power:10,tp:0,
     techniques:{
-      pressureBurst:false,
-      airStep:false,
-      vortex:false,
-      spiralGuard:false,
-      turbulence:false,
-      tempest:false
+      pressureBurst:false,airStep:false,vortex:false,
+      spiralGuard:false,turbulence:false,tempest:false
     }
   },
-
   campaign:{
     currentMissionId:null,
     scene:"home",
-
-    checkpoint:{
-      scene:"home",
-      x:.5,
-      y:.55
-    }
+    checkpoint:{scene:"home",x:.5,y:.54}
   },
-
   missions:{
-    valleyGate:makeMissionState("available"),
-    forestPursuit:makeMissionState("locked"),
-    mountainPass:makeMissionState("locked"),
-    ancientRuins:makeMissionState("locked"),
-    stormCore:makeMissionState("locked"),
-    tempestCitadel:makeMissionState("locked")
+    valleyGate:missionState("available"),
+    forestPursuit:missionState(),
+    mountainPass:missionState(),
+    ancientRuins:missionState(),
+    stormCore:missionState(),
+    tempestCitadel:missionState()
   },
-
-  dojo:{
-    tChamberUnlocked:false
-  },
-
-  scouter:{
-    techniques:{},
-    kills:0,
-    deflections:0,
-    traversals:0
-  },
-
-  codex:{
-    entries:[]
-  },
-
+  dojo:{tChamberUnlocked:false},
+  scouter:{techniques:{},kills:0,deflections:0,traversals:0},
+  codex:{entries:[]},
   drills:{}
 };
 
-
-function clone(value){
-  return JSON.parse(JSON.stringify(value));
-}
-
+function clone(v){return JSON.parse(JSON.stringify(v))}
 
 function merge(base,extra){
-  for(const key in extra||{}){
-    if(
-      extra[key] &&
-      typeof extra[key]==="object" &&
-      !Array.isArray(extra[key])
-    ){
-      base[key]=merge(base[key]||{},extra[key]);
-    }else{
-      base[key]=extra[key];
-    }
+  for(const k in extra||{}){
+    if(extra[k]&&typeof extra[k]==="object"&&!Array.isArray(extra[k]))
+      base[k]=merge(base[k]||{},extra[k]);
+    else base[k]=extra[k];
   }
   return base;
 }
 
-
 /* ============================================================
-   SAVE VALIDATION
+   SAVE / VALIDATION
    ============================================================ */
 
-const SaveSystem = {
+const SnapshotValidator={
+  validate(s){
+    if(!s||s.version!==4)return clone(DEFAULT_SAVE);
 
-  createValidatedSnapshot(state){
+    s.player??={};
+    s.player.techniques??={};
+    s.campaign??={};
+    s.campaign.checkpoint??={scene:"home",x:.5,y:.54};
+    s.missions??={};
+    s.scouter??={techniques:{},kills:0,deflections:0,traversals:0};
+    s.scouter.techniques??={};
+    s.codex??={entries:[]};
+    s.drills??={};
+    s.dojo??={tChamberUnlocked:false};
 
-    const snapshot = {
-      version:3,
+    s.player.level=Math.max(1,Number(s.player.level)||1);
+    s.player.xp=Math.max(0,Number(s.player.xp)||0);
+    s.player.power=Math.max(1,Number(s.player.power)||1);
+    s.player.tp=Math.max(0,Number(s.player.tp)||0);
 
-      player:{
-        level:state.player.level,
-        xp:state.player.xp,
-        power:state.player.power,
-        tp:state.player.tp,
-        techniques:clone(state.player.techniques)
-      },
+    for(const id of Object.keys(TECHNIQUES))
+      s.player.techniques[id]=!!s.player.techniques[id];
 
-      campaign:{
-        currentMissionId:state.campaign.currentMissionId,
-        scene:state.campaign.scene,
-        checkpoint:clone(state.campaign.checkpoint)
-      },
+    for(const id of MISSION_IDS){
+      if(!s.missions[id])s.missions[id]=missionState();
+      const m=s.missions[id];
+      m.progress=Math.max(0,Number(m.progress)||0);
+      m.phaseTimer=Math.max(0,Number(m.phaseTimer)||0);
+      m.discovery=!!m.discovery;
+      m.bossDefeated=!!m.bossDefeated;
+      m.rewardApplied=!!m.rewardApplied;
+      m.deflections=Math.max(0,Number(m.deflections)||0);
+    }
 
-      missions:clone(state.missions),
+    const cp=s.campaign.checkpoint;
+    cp.x=Math.min(1,Math.max(0,Number(cp.x)||.5));
+    cp.y=Math.min(1,Math.max(0,Number(cp.y)||.54));
 
-      dojo:{
-        tChamberUnlocked:!!state.dojo.tChamberUnlocked
-      },
+    return s;
+  }
+};
 
-      scouter:clone(state.scouter),
-      codex:clone(state.codex),
-      drills:clone(state.drills)
-    };
-
-    return SnapshotValidator.validate(snapshot);
+const SaveSystem={
+  snapshot(){
+    return SnapshotValidator.validate({
+      version:4,
+      player:clone(S.player),
+      campaign:clone(S.campaign),
+      missions:clone(S.missions),
+      dojo:clone(S.dojo),
+      scouter:clone(S.scouter),
+      codex:clone(S.codex),
+      drills:clone(S.drills)
+    });
   },
-
-  persist(state){
-    const snapshot=this.createValidatedSnapshot(state);
-    localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot));
+  persist(){
+    try{
+      localStorage.setItem(SAVE_KEY,JSON.stringify(this.snapshot()));
+    }catch(e){}
   },
-
   load(){
     try{
       const raw=localStorage.getItem(SAVE_KEY);
-
-      if(!raw){
-        return clone(DEFAULT_SAVE);
-      }
-
+      if(!raw)return clone(DEFAULT_SAVE);
       return SnapshotValidator.validate(
         merge(clone(DEFAULT_SAVE),JSON.parse(raw))
       );
-
-    }catch{
+    }catch(e){
       return clone(DEFAULT_SAVE);
     }
   }
 };
-
-
-const SnapshotValidator = {
-
-  validate(snapshot){
-
-    if(!snapshot || snapshot.version!==3){
-      return clone(DEFAULT_SAVE);
-    }
-
-    if(!snapshot.player || !snapshot.campaign){
-      return clone(DEFAULT_SAVE);
-    }
-
-    snapshot.player.level=Math.max(1,Number(snapshot.player.level)||1);
-    snapshot.player.xp=Math.max(0,Number(snapshot.player.xp)||0);
-    snapshot.player.power=Math.max(1,Number(snapshot.player.power)||1);
-    snapshot.player.tp=Math.max(0,Number(snapshot.player.tp)||0);
-
-    if(!snapshot.campaign.checkpoint){
-      snapshot.campaign.checkpoint={
-        scene:"home",
-        x:.5,
-        y:.55
-      };
-    }
-
-    snapshot.campaign.checkpoint.x=Math.min(
-      1,
-      Math.max(0,Number(snapshot.campaign.checkpoint.x)||.5)
-    );
-
-    snapshot.campaign.checkpoint.y=Math.min(
-      1,
-      Math.max(0,Number(snapshot.campaign.checkpoint.y)||.55)
-    );
-
-    for(const m of Object.values(MISSIONS)){
-      const s=snapshot.missions[m.id];
-
-      if(!s){
-        snapshot.missions[m.id]=makeMissionState("locked");
-        continue;
-      }
-
-      s.progress=Math.max(0,Number(s.progress)||0);
-      s.bossDefeated=!!s.bossDefeated;
-      s.discovery=!!s.discovery;
-      s.rewardApplied=!!s.rewardApplied;
-    }
-
-    return snapshot;
-  }
-};
-
-
-/* ============================================================
-   AUTHORITATIVE RUNTIME STATE
-   ============================================================ */
 
 let S=SaveSystem.load();
 
-
 /* ============================================================
-   WORLD RUNTIME
+   RUNTIME
    ============================================================ */
 
-let canvas=document.getElementById("game");
-let ctx=canvas.getContext("2d");
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
 
-let W=innerWidth;
-let H=innerHeight;
-let DPR=1;
+let W=innerWidth,H=innerHeight,DPR=1;
 
-let runtimeState = {
+const runtime={
+  scene:"home",
   player:{
-    x:W*.5,
-    y:H*.55,
-    radius:15,
-
-    hp:100,
-    maxHp:100,
-
-    energy:100,
-    maxEnergy:100,
-
-    dx:1,
-    dy:0,
-
+    x:W*.5,y:H*.54,radius:15,
+    hp:100,maxHp:100,
+    energy:100,maxEnergy:100,
+    dx:1,dy:0,
     dashTimer:0,
     invulnerable:0,
-
-    airborne:false,
-    guardTimer:0
+    guardTimer:0,
+    airborne:false
   },
-
   entities:[],
   projectiles:[],
-
-  scene:"home",
-
   now:0,
-
-  worldFlags:{
-    bridgeCrossed:false,
-    westExitOpened:false
-  }
+  flags:{bridgeCrossed:false},
+  lastCommandTime:0
 };
-
-
-/* ============================================================
-   UI
-   ============================================================ */
-
-const $=s=>document.querySelector(s);
 
 const UI={
-  lv:$("#lv"),
-  pw:$("#pw"),
-  xp:$("#xp"),
-  need:$("#need"),
-  tp:$("#tp"),
-  hp:$("#hp"),
-  en:$("#en"),
-  hpt:$("#hpt"),
-  ent:$("#ent"),
-  obj:$("#obj"),
-  region:$("#region"),
-  phase:$("#phase"),
-  stat:$("#stat"),
-  modal:$("#modal"),
-  panel:$("#panel")
+  lv:document.getElementById("lv"),
+  pw:document.getElementById("pw"),
+  xp:document.getElementById("xp"),
+  need:document.getElementById("need"),
+  tp:document.getElementById("tp"),
+  hp:document.getElementById("hp"),
+  en:document.getElementById("en"),
+  hpt:document.getElementById("hpt"),
+  ent:document.getElementById("ent"),
+  obj:document.getElementById("obj"),
+  region:document.getElementById("region"),
+  phase:document.getElementById("phase"),
+  stat:document.getElementById("stat"),
+  modal:document.getElementById("modal"),
+  panel:document.getElementById("panel")
 };
 
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2);
+  W=innerWidth;H=innerHeight;
+  canvas.width=W*DPR;
+  canvas.height=H*DPR;
+  canvas.style.width=W+"px";
+  canvas.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  buildDojoZones();
+}
+addEventListener("resize",resize);
 
 /* ============================================================
    EVENT BUS
    ============================================================ */
 
 const EventBus=(()=>{
-
   const listeners={};
 
   return {
-
-    on(type,listener){
-      (listeners[type]??=[]).push(listener);
+    on(type,fn){
+      if(typeof fn!=="function")return;
+      (listeners[type]??=[]).push(fn);
     },
-
     emit(result){
-
       const frozen=deepFreeze(result);
-
-      for(const listener of listeners[frozen.eventType]||[]){
-        listener(frozen);
+      for(const fn of listeners[frozen.eventType]||[]){
+        try{fn(frozen)}catch(err){
+          console.error("Event consumer error:",frozen.eventType,err);
+        }
       }
-
       return frozen;
     }
-
   };
-
 })();
 
-
-function deepFreeze(value){
-
-  if(
-    !value ||
-    typeof value!=="object" ||
-    Object.isFrozen(value)
-  ){
-    return value;
-  }
-
-  Object.freeze(value);
-
-  for(const key of Object.keys(value)){
-    deepFreeze(value[key]);
-  }
-
-  return value;
+function deepFreeze(v){
+  if(!v||typeof v!=="object"||Object.isFrozen(v))return v;
+  Object.freeze(v);
+  for(const k of Object.keys(v))deepFreeze(v[k]);
+  return v;
 }
 
+function result(type,data={}){
+  return {
+    eventType:type,
+    eventId:
+      globalThis.crypto?.randomUUID?.()||
+      `evt_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    timestamp:performance.now(),
+    ...data
+  };
+}
 
 /* ============================================================
    INPUT ROUTER
@@ -1220,2434 +511,20 @@ function deepFreeze(value){
 const RequestQueue=[];
 
 const InputRouter={
-
-  createRequest(input){
-
-    return {
+  submit(data){
+    RequestQueue.push({
       id:
-        globalThis.crypto?.randomUUID?.() ||
+        globalThis.crypto?.randomUUID?.()||
         `${Date.now()}_${Math.random()}`,
-
-      type:input.type,
-
       actorId:"player",
-
-      techniqueId:input.techniqueId||null,
-
-      direction:input.direction||null,
-
-      source:input.source||"unknown",
-
-      timestamp:performance.now()
-    };
-  },
-
-  submit(input){
-
-    RequestQueue.push(
-      this.createRequest(input)
-    );
-  }
-};
-
-
-/* ============================================================
-   VALIDATOR
-   ============================================================ */
-
-const Validator={
-
-  validate(request,state){
-
-    if(!request || typeof request.type!=="string"){
-      return {
-        ok:false,
-        rejection:{
-          eventType:"requestRejected",
-          requestId:request?.id||null,
-          reason:"invalidRequest"
-        }
-      };
-    }
-
-    if(request.type==="move"){
-      return {
-        ok:true,
-        request
-      };
-    }
-
-    if(request.type==="attack"){
-      return {
-        ok:true,
-        request
-      };
-    }
-
-    if(request.type==="dash"){
-      if(state.player.dashTimer>0){
-        return {
-          ok:false,
-          rejection:{
-            eventType:"requestRejected",
-            requestId:request.id,
-            reason:"dashCooldown"
-          }
-        };
-      }
-
-      return {
-        ok:true,
-        request
-      };
-    }
-
-    if(request.type==="useTechnique"){
-
-      const t=TECHNIQUES[request.techniqueId];
-
-      if(!t){
-        return {
-          ok:false,
-          rejection:{
-            eventType:"requestRejected",
-            requestId:request.id,
-            reason:"unknownTechnique",
-            techniqueId:request.techniqueId
-          }
-        };
-      }
-
-      if(!S.player.techniques[t.id]){
-        return {
-          ok:false,
-          rejection:{
-            eventType:"requestRejected",
-            requestId:request.id,
-            reason:"techniqueLocked",
-            techniqueId:t.id
-          }
-        };
-      }
-
-      if(state.player.energy<t.cost){
-        return {
-          ok:false,
-          rejection:{
-            eventType:"requestRejected",
-            requestId:request.id,
-            reason:"outOfEnergy",
-            techniqueId:t.id
-          }
-        };
-      }
-
-      return {
-        ok:true,
-        request
-      };
-    }
-
-    if(request.type==="interact"){
-      return {
-        ok:true,
-        request
-      };
-    }
-
-    return {
-      ok:false,
-      rejection:{
-        eventType:"requestRejected",
-        requestId:request.id,
-        reason:"unknownRequest"
-      }
-    };
-  }
-
-};
-
-
-/* ============================================================
-   GENERIC WORLD HELPERS
-   These helpers are only called by T-Engine.
-   ============================================================ */
-
-function distance(a,b){
-  return Math.hypot(a.x-b.x,a.y-b.y);
-}
-
-
-function spawnEnemy(type,x,y,options={}){
-
-  const d=ENEMIES[type];
-
-  if(!d)return null;
-
-  const boss=!!options.boss;
-
-  const entity={
-    id:
-      options.id ||
-      `enemy_${Math.random().toString(36).slice(2)}`,
-
-    type,
-
-    x,
-    y,
-
-    radius:boss?25:14,
-
-    hp:boss?d.hp*4:d.hp,
-    maxHp:boss?d.hp*4:d.hp,
-
-    stability:boss?d.stability*2:d.stability,
-    maxStability:boss?d.stability*2:d.stability,
-
-    speed:boss?d.speed*1.1:d.speed,
-    damage:boss?d.damage*1.4:d.damage,
-
-    color:boss?"#ff9e55":d.color,
-
-    ranged:d.ranged,
-
-    boss,
-
-    attackCooldown:.5,
-    hitTimer:0,
-
-    phase:1
-  };
-
-  runtimeState.entities.push(entity);
-
-  return entity;
-}
-
-
-function spawnProjectile(
-  x,y,vx,vy,enemy=false,source="world"
-){
-
-  runtimeState.projectiles.push({
-
-    id:`projectile_${Math.random().toString(36).slice(2)}`,
-
-    x,
-    y,
-
-    vx,
-    vy,
-
-    radius:6,
-
-    lifetime:2,
-
-    enemy,
-
-    source,
-
-    resolved:false
-  });
-}
-
-
-/* ============================================================
-   T-ENGINE
-   ============================================================ */
-
-const TEngine={
-
-  /*
-   This is the physical authority.
-
-   No Campaign / Scouter / Codex / T-Chamber / Effects /
-   Doraemon method mutates physical world state.
-   */
-
-  execute(request,state,dt){
-
-    switch(request.type){
-
-      case "move":
-        return this.resolveMove(request,state,dt);
-
-      case "attack":
-        return this.resolveAttack(request,state);
-
-      case "dash":
-        return this.resolveDash(request,state);
-
-      case "useTechnique":
-        return TechniqueSystem.executeThroughEngine(
-          request,
-          state
-        );
-
-      case "interact":
-        return this.resolveInteraction(request,state);
-
-      default:
-
-        return {
-          eventType:"requestRejected",
-          requestId:request.id,
-          reason:"unsupportedExecution"
-        };
-    }
-  },
-
-
-  resolveMove(request,state,dt){
-
-    const input=request.direction||{x:0,y:0};
-
-    let x=Number(input.x)||0;
-    let y=Number(input.y)||0;
-
-    const len=Math.hypot(x,y);
-
-    if(len>1){
-      x/=len;
-      y/=len;
-    }
-
-    if(len>0){
-      state.player.dx=x;
-      state.player.dy=y;
-    }
-
-    const speed=state.player.dashTimer>0?680:185;
-
-    const old={
-      x:state.player.x,
-      y:state.player.y
-    };
-
-    state.player.x+=x*speed*dt;
-    state.player.y+=y*speed*dt;
-
-    state.player.x=Math.max(
-      15,
-      Math.min(W-15,state.player.x)
-    );
-
-    state.player.y=Math.max(
-      15,
-      Math.min(H-15,state.player.y)
-    );
-
-    state.player.airborne =
-      state.scene==="forestBridge" &&
-      state.player.y<H*.43;
-
-    return {
-      eventType:"movementResolved",
-
-      requestId:request.id,
-
-      actorId:"player",
-
-      applied:true,
-
-      movementResult:{
-        startPosition:old,
-        endPosition:{
-          x:state.player.x,
-          y:state.player.y
-        },
-
-        distanceMoved:Math.hypot(
-          state.player.x-old.x,
-          state.player.y-old.y
-        )
-      }
-    };
-  },
-
-
-  resolveDash(request,state){
-
-    const p=state.player;
-
-    if(p.dashTimer>0){
-      return {
-        eventType:"dashResolved",
-        requestId:request.id,
-        activated:false,
-        success:false,
-        energySpent:0
-      };
-    }
-
-    if(p.energy<10){
-      return {
-        eventType:"dashResolved",
-        requestId:request.id,
-        activated:false,
-        success:false,
-        energySpent:0,
-        failureReason:"outOfEnergy"
-      };
-    }
-
-    p.energy-=10;
-    p.dashTimer=.20;
-    p.invulnerable=.20;
-
-    const start={x:p.x,y:p.y};
-
-    p.x+=p.dx*95;
-    p.y+=p.dy*95;
-
-    p.x=Math.max(15,Math.min(W-15,p.x));
-    p.y=Math.max(15,Math.min(H-15,p.y));
-
-    return {
-      eventType:"dashResolved",
-
-      requestId:request.id,
-
-      activated:true,
-      success:true,
-
-      energySpent:10,
-
-      movementResult:{
-        startPosition:start,
-        endPosition:{
-          x:p.x,
-          y:p.y
-        },
-        distanceMoved:95
-      }
-    };
-  },
-
-
-  resolveAttack(request,state){
-
-    const p=state.player;
-
-    let target=null;
-    let best=Infinity;
-
-    for(const e of state.entities){
-
-      const d=distance(p,e);
-
-      if(d<best){
-        best=d;
-        target=e;
-      }
-    }
-
-    const result={
-      eventType:"attackResolved",
-
-      requestId:request.id,
-
-      actorId:"player",
-
-      activated:true,
-      success:false,
-
-      damage:0,
-
-      targetsAffected:[],
-
-      projectileCreated:false
-    };
-
-    if(
-      target &&
-      best<175
-    ){
-
-      const dx=target.x-p.x;
-      const dy=target.y-p.y;
-      const len=Math.hypot(dx,dy)||1;
-
-      p.dx=dx/len;
-      p.dy=dy/len;
-
-      this.applyDamage(
-        target,
-        16,
-        18,
-        p.dx*25,
-        p.dy*25,
-        result
-      );
-
-      result.success=true;
-
-    }else{
-
-      spawnProjectile(
-        p.x+p.dx*20,
-        p.y+p.dy*20,
-        p.dx*430,
-        p.dy*430,
-        false,
-        "basicAttack"
-      );
-
-      result.projectileCreated=true;
-    }
-
-    return result;
-  },
-
-
-  applyDamage(
-    target,
-    damage,
-    stabilityDamage,
-    knockbackX,
-    knockbackY,
-    result
-  ){
-
-    if(!target)return;
-
-    target.hp-=damage;
-
-    target.stability-=stabilityDamage;
-
-    target.x+=knockbackX;
-    target.y+=knockbackY;
-
-    target.hitTimer=.14;
-
-    result.targetsAffected.push({
-      id:target.id,
-      damage,
-      stabilityDamage
+      timestamp:performance.now(),
+      type:data.type,
+      source:data.source||"unknown",
+      direction:data.direction||null,
+      techniqueId:data.techniqueId||null
     });
-
-    let stabilityBroken=false;
-
-    if(target.stability<=0){
-
-      stabilityBroken=true;
-
-      target.stability=target.maxStability;
-
-      target.hitTimer=.7;
-    }
-
-    if(target.hp<=0){
-
-      const index=runtimeState.entities.indexOf(target);
-
-      if(index>=0){
-        runtimeState.entities.splice(index,1);
-      }
-
-      EventBus.emit({
-        eventType:"enemyDefeated",
-
-        eventId:
-          `enemyDefeated_${Math.random()}`,
-
-        enemyId:target.id,
-        enemyType:target.type,
-
-        boss:target.boss,
-
-        defeatedBy:{
-          actorId:"player",
-          source:result.techniqueId||"attack"
-        },
-
-        combatResult:{
-          damageTaken:damage,
-          stabilityBroken
-        },
-
-        missionId:S.campaign.currentMissionId
-      });
-
-    }
-
-  },
-
-
-  resolveProjectileCollision(projectile){
-
-    const p=runtimeState.player;
-
-    if(!projectile.enemy)return false;
-
-    if(
-      distance(projectile,p) >
-      p.radius+projectile.radius+5
-    ){
-      return false;
-    }
-
-    if(p.invulnerable>0){
-      return true;
-    }
-
-    if(p.guardTimer>0){
-
-      EventBus.emit({
-
-        eventType:"projectileDeflected",
-
-        eventId:`deflect_${Math.random()}`,
-
-        projectileId:projectile.id,
-
-        actorId:"player",
-
-        source:projectile.source,
-
-        success:true
-      });
-
-      projectile.vx=-projectile.vx*1.15;
-      projectile.vy=-projectile.vy*1.15;
-      projectile.enemy=false;
-      projectile.source="deflected";
-
-      return true;
-    }
-
-    p.hp-=7;
-
-    EventBus.emit({
-
-      eventType:"playerDamaged",
-
-      eventId:`damage_${Math.random()}`,
-
-      damage:7,
-
-      source:projectile.source,
-
-      hpRemaining:Math.max(0,p.hp)
-    });
-
-    projectile.resolved=true;
-
-    return true;
-  },
-
-
-  resolveEnemyCollision(entity){
-
-    const p=runtimeState.player;
-
-    const d=distance(entity,p);
-
-    if(
-      d >
-      entity.radius+p.radius+5
-    ){
-      return;
-    }
-
-    if(entity.attackCooldown>0){
-      return;
-    }
-
-    entity.attackCooldown=.82;
-
-    if(p.guardTimer>0){
-
-      entity.stability-=36;
-
-      EventBus.emit({
-
-        eventType:"guardContactResolved",
-
-        eventId:`guard_${Math.random()}`,
-
-        enemyId:entity.id,
-
-        stabilityDamage:36
-      });
-
-      if(entity.stability<=0){
-
-        entity.stability=entity.maxStability;
-
-        EventBus.emit({
-
-          eventType:"enemyStabilityBroken",
-
-          enemyId:entity.id,
-
-          source:"guard"
-        });
-      }
-
-      return;
-    }
-
-    if(p.invulnerable<=0){
-
-      p.hp-=entity.damage;
-
-      EventBus.emit({
-
-        eventType:"playerDamaged",
-
-        eventId:`damage_${Math.random()}`,
-
-        damage:entity.damage,
-
-        source:"enemyContact",
-
-        enemyId:entity.id,
-
-        hpRemaining:Math.max(0,p.hp)
-      });
-    }
-  },
-
-
-  /*
-   Generic technique interaction.
-   Mission content is inspected only as data.
-  */
-
-  resolveTraversal(){
-
-    const mission=CampaignSystem.currentMission();
-
-    if(!mission)return null;
-
-    const state=S.missions[mission.id];
-
-    const phase=mission.phases[state.phase];
-
-    if(
-      phase?.traversalGate==="brokenBridge" &&
-      runtimeState.scene==="forestBridge" &&
-      runtimeState.player.x>W*.68 &&
-      runtimeState.player.y<H*.46
-    ){
-
-      return "brokenBridge";
-    }
-
-    return null;
-  },
-
-
-  resolveInteraction(request){
-
-    const result={
-      eventType:"interactionResolved",
-
-      requestId:request.id,
-
-      success:false,
-
-      target:null
-    };
-
-    if(runtimeState.scene!=="home"){
-      return result;
-    }
-
-    for(const [id,z] of Object.entries(DojoZones)){
-
-      if(
-        Math.hypot(
-          runtimeState.player.x-z.x,
-          runtimeState.player.y-z.y
-        )<
-        z.radius+20
-      ){
-
-        result.success=true;
-        result.target=id;
-
-        return result;
-      }
-    }
-
-    return result;
-  },
-
-
-  /*
-   All continuous physical simulation occurs here.
-
-   No consumer runs enemy movement, projectile movement,
-   player damage, collision, boss logic, or physical triggers.
-  */
-
-  tick(dt){
-
-    const state=runtimeState;
-    const p=state.player;
-
-    if(state.scene==="home" || state.scene==="training"){
-      p.energy=Math.min(
-        p.maxEnergy,
-        p.energy+10*dt
-      );
-
-      p.dashTimer=Math.max(0,p.dashTimer-dt);
-      p.invulnerable=Math.max(0,p.invulnerable-dt);
-      p.guardTimer=Math.max(0,p.guardTimer-dt);
-
-      return;
-    }
-
-    p.energy=Math.min(
-      p.maxEnergy,
-      p.energy+8*dt
-    );
-
-    p.dashTimer=Math.max(0,p.dashTimer-dt);
-    p.invulnerable=Math.max(0,p.invulnerable-dt);
-    p.guardTimer=Math.max(0,p.guardTimer-dt);
-
-    /*
-     Enemy simulation authority.
-    */
-
-    for(const e of [...state.entities]){
-
-      e.attackCooldown-=dt;
-      e.hitTimer-=dt;
-
-      const dx=p.x-e.x;
-      const dy=p.y-e.y;
-      const d=Math.hypot(dx,dy)||1;
-
-      if(e.ranged){
-
-        if(d>120){
-
-          e.x+=dx/d*e.speed*dt;
-          e.y+=dy/d*e.speed*dt;
-        }
-
-        if(
-          e.attackCooldown<=0 &&
-          d<330
-        ){
-
-          e.attackCooldown=1.25;
-
-          spawnProjectile(
-            e.x,
-            e.y,
-            dx/d*190,
-            dy/d*190,
-            true,
-            e.type
-          );
-        }
-
-      }else{
-
-        if(d>e.radius+p.radius+10){
-
-          e.x+=dx/d*e.speed*dt;
-          e.y+=dy/d*e.speed*dt;
-        }
-      }
-
-      /*
-       Stability naturally recovers.
-      */
-
-      e.stability=Math.min(
-        e.maxStability,
-        e.stability+9*dt
-      );
-
-      this.resolveEnemyCollision(e);
-    }
-
-
-    /*
-     Projectile simulation authority.
-    */
-
-    for(let i=state.projectiles.length-1;i>=0;i--){
-
-      const projectile=state.projectiles[i];
-
-      projectile.x+=projectile.vx*dt;
-      projectile.y+=projectile.vy*dt;
-
-      projectile.lifetime-=dt;
-
-      if(projectile.resolved || projectile.lifetime<=0){
-
-        state.projectiles.splice(i,1);
-
-        continue;
-      }
-
-
-      /*
-       Deflected/player projectiles can hit enemies.
-      */
-
-      if(!projectile.enemy){
-
-        let hitTarget=null;
-
-        for(const e of [...state.entities]){
-
-          if(
-            distance(projectile,e)<
-            projectile.radius+e.radius
-          ){
-
-            hitTarget=e;
-            break;
-          }
-        }
-
-        if(hitTarget){
-
-          const r={
-            eventType:"projectileHitResolved",
-
-            projectileId:projectile.id,
-
-            techniqueId:
-              projectile.source==="deflected"
-                ?"spiralGuard"
-                :null,
-
-            targetsAffected:[]
-          };
-
-          this.applyDamage(
-            hitTarget,
-            projectile.source==="deflected"?24:16,
-            projectile.source==="deflected"?28:18,
-            projectile.vx*.035,
-            projectile.vy*.035,
-            r
-          );
-
-          EventBus.emit(r);
-
-          state.projectiles.splice(i,1);
-
-          continue;
-        }
-      }
-
-
-      if(projectile.enemy){
-
-        if(
-          this.resolveProjectileCollision(projectile)
-        ){
-
-          if(
-            projectile.resolved ||
-            projectile.enemy
-          ){
-            state.projectiles.splice(i,1);
-          }
-
-          continue;
-        }
-      }
-
-
-      if(
-        projectile.x<-40 ||
-        projectile.x>W+40 ||
-        projectile.y<-40 ||
-        projectile.y>H+40
-      ){
-        state.projectiles.splice(i,1);
-      }
-    }
-
-
-    /*
-     Generic traversal gate.
-     Physical crossing becomes true here.
-    */
-
-    const traversal=this.resolveTraversal();
-
-    if(traversal){
-
-      EventBus.emit({
-
-        eventType:"traversalResolved",
-
-        eventId:`traversal_${Math.random()}`,
-
-        gateId:traversal,
-
-        actorId:"player",
-
-        success:true,
-
-        position:{
-          x:p.x,
-          y:p.y
-        }
-      });
-    }
-
-
-    /*
-     Generic return gate.
-    */
-
-    const mission=CampaignSystem.currentMission();
-
-    if(mission){
-
-      const ms=S.missions[mission.id];
-      const phase=mission.phases[ms.phase];
-
-      if(
-        phase?.returnGate==="west" &&
-        p.x<W*.08
-      ){
-
-        EventBus.emit({
-
-          eventType:"returnGateCrossed",
-
-          eventId:`return_${Math.random()}`,
-
-          missionId:mission.id,
-
-          gateId:"west",
-
-          success:true
-        });
-      }
-    }
-
-
-    /*
-     Generic death truth.
-    */
-
-    if(p.hp<=0){
-
-      EventBus.emit({
-
-        eventType:"playerDefeated",
-
-        eventId:`death_${Math.random()}`,
-
-        checkpointAvailable:true
-      });
-
-      p.hp=p.maxHp;
-      p.energy=p.maxEnergy;
-    }
-  }
-
-};
-
-
-/* ============================================================
-   TECHNIQUE SYSTEM
-   ============================================================ */
-
-const TechniqueSystem={
-
-  executeThroughEngine(request,state){
-
-    const technique=TECHNIQUES[request.techniqueId];
-
-    const startTime=performance.now();
-
-    const result={
-      eventType:"techniqueResolved",
-
-      eventId:`technique_${Math.random()}`,
-
-      requestId:request.id,
-
-      techniqueId:technique.id,
-
-      actorId:"player",
-
-      requestedAt:request.timestamp,
-
-      resolvedAt:startTime,
-
-      activated:false,
-
-      success:false,
-
-      failureReason:null,
-
-      energySpent:0,
-
-      cooldownStarted:false,
-
-      timing:{
-        reactionMs:Math.max(
-          0,
-          startTime-request.timestamp
-        ),
-        grade:"good"
-      },
-
-      movementResult:null,
-
-      collisionResult:null,
-
-      targetsAffected:[],
-
-      interaction:null,
-
-      environmentalEffect:null
-    };
-
-
-    if(
-      state.player.energy<
-      technique.cost
-    ){
-
-      result.failureReason="outOfEnergy";
-
-      return result;
-    }
-
-
-    state.player.energy-=technique.cost;
-
-    result.energySpent=technique.cost;
-
-    result.activated=true;
-
-    const handler=
-      TECHNIQUE_HANDLERS[
-        technique.handlerId
-      ];
-
-    if(!handler){
-
-      result.activated=false;
-      result.failureReason="missingHandler";
-
-      return result;
-    }
-
-    handler(
-      technique,
-      result,
-      state
-    );
-
-    return result;
-  }
-
-};
-
-
-/* ============================================================
-   GENERIC TECHNIQUE HANDLERS
-   ============================================================ */
-
-const TECHNIQUE_HANDLERS={
-
-  pressureBurst(technique,result,state){
-
-    const p=state.player;
-
-    for(const e of [...state.entities]){
-
-      const dx=e.x-p.x;
-      const dy=e.y-p.y;
-      const d=Math.hypot(dx,dy)||1;
-
-      if(d<175){
-
-        TEngine.applyDamage(
-          e,
-          28,
-          35,
-          dx/d*105,
-          dy/d*105,
-          result
-        );
-      }
-    }
-
-    result.success=result.targetsAffected.length>0;
-
-    result.interaction={
-      category:"crowdControl",
-      tags:["pressure","spaceCreation"]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#c38cff",
-      35
-    );
-  },
-
-
-  airStep(technique,result,state){
-
-    const p=state.player;
-
-    if(!p.airborne){
-
-      result.failureReason="requiresAirborne";
-
-      /*
-       Energy spent is reversed because activation did not occur.
-      */
-
-      p.energy+=result.energySpent;
-      result.energySpent=0;
-      result.activated=false;
-
-      return;
-    }
-
-    const start={
-      x:p.x,
-      y:p.y
-    };
-
-    p.x+=p.dx*135;
-    p.y+=p.dy*135;
-
-    p.x=Math.max(15,Math.min(W-15,p.x));
-    p.y=Math.max(15,Math.min(H-15,p.y));
-
-    const gate=TEngine.resolveTraversal();
-
-    p.airborne=false;
-
-    result.success=true;
-
-    result.movementResult={
-      applied:true,
-
-      startPosition:start,
-
-      endPosition:{
-        x:p.x,
-        y:p.y
-      },
-
-      distanceMoved:135,
-
-      wasAirborne:true,
-
-      landed:true
-    };
-
-    result.collisionResult={
-      crossedTraversalGate:
-        gate==="brokenBridge",
-
-      traversalGate:
-        gate==="brokenBridge"
-          ?"brokenBridge"
-          :null
-    };
-
-    result.interaction={
-      category:"traversal",
-      tags:["airborne","aerialMobility"]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#6ceeff",
-      22
-    );
-  },
-
-
-  vortex(technique,result,state){
-
-    const p=state.player;
-
-    for(const e of [...state.entities]){
-
-      const dx=p.x-e.x;
-      const dy=p.y-e.y;
-
-      const d=Math.hypot(dx,dy)||1;
-
-      if(d<235){
-
-        TEngine.applyDamage(
-          e,
-          20,
-          50,
-          dx/d*82,
-          dy/d*82,
-          result
-        );
-      }
-    }
-
-    result.success=result.targetsAffected.length>0;
-
-    result.interaction={
-      category:"groupControl",
-      tags:["rotation","pull","formationBreak"]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#ffd46a",
-      42
-    );
-  },
-
-
-  spiralGuard(technique,result,state){
-
-    const p=state.player;
-
-    p.guardTimer=.72;
-
-    result.success=true;
-
-    result.interaction={
-      category:"activeDefense",
-      tags:["deflection","guard","projectileControl"]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#8fffe2",
-      18
-    );
-  },
-
-
-  turbulence(technique,result,state){
-
-    const p=state.player;
-
-    for(const e of state.entities){
-
-      const d=distance(p,e);
-
-      if(d<215){
-
-        e.speed*=.45;
-
-        e.attackCooldown=Math.max(
-          e.attackCooldown,
-          1.0
-        );
-
-        result.targetsAffected.push({
-          id:e.id,
-          disrupted:true
-        });
-      }
-    }
-
-    result.success=result.targetsAffected.length>0;
-
-    result.interaction={
-      category:"disruption",
-      tags:["turbulence","instability","accuracyBreak"]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#ff77b9",
-      38
-    );
-  },
-
-
-  tempest(technique,result,state){
-
-    const p=state.player;
-
-    for(const e of [...state.entities]){
-
-      const dx=e.x-p.x;
-      const dy=e.y-p.y;
-
-      const d=Math.hypot(dx,dy)||1;
-
-      if(d<270){
-
-        TEngine.applyDamage(
-          e,
-          46,
-          85,
-          dx/d*145,
-          dy/d*145,
-          result
-        );
-      }
-    }
-
-    result.success=result.targetsAffected.length>0;
-
-    result.interaction={
-      category:"synthesis",
-      tags:[
-        "wind",
-        "pressure",
-        "rotation",
-        "turbulence"
-      ]
-    };
-
-    EffectsSystem.emitBurst(
-      p.x,
-      p.y,
-      "#f6e17a",
-      65
-    );
-  }
-
-};
-
-
-/* ============================================================
-   CENTRAL PROCESSING BOUNDARY
-   ============================================================ */
-
-function processRequest(request,dt){
-
-  /*
-   This is the only command → authoritative outcome route.
-  */
-
-  const validation=
-    Validator.validate(
-      request,
-      runtimeState
-    );
-
-  if(!validation.ok){
-
-    return EventBus.emit(
-      deepFreeze(
-        validation.rejection
-      )
-    );
-  }
-
-  const result=
-    deepFreeze(
-      TEngine.execute(
-        validation.request,
-        runtimeState,
-        dt
-      )
-    );
-
-  return EventBus.emit(result);
-}
-
-
-/* ============================================================
-   CAMPAIGN SYSTEM
-   ============================================================ */
-
-const CampaignSystem={
-
-  currentMission(){
-
-    const id=S.campaign.currentMissionId;
-
-    return id?
-      MISSIONS[id]:
-      null;
-  },
-
-
-  startMission(id){
-
-    const mission=MISSIONS[id];
-
-    if(!mission)return;
-
-    const ms=S.missions[id];
-
-    if(
-      ms.status!=="available" &&
-      ms.status!=="active"
-    ){
-      return;
-    }
-
-    S.campaign.currentMissionId=id;
-
-    ms.status="active";
-
-    /*
-     Mission starts are content interpretation.
-     Physical placement is reconstructed by T-Engine.
-    */
-
-    ms.phase=
-      ms.phase==="available"
-        ? Object.keys(mission.phases)[0]
-        : ms.phase;
-
-    ms.progress=0;
-
-    ms.bossDefeated=false;
-
-    runtimeState.scene=
-      id==="forestPursuit" &&
-      ms.phase==="bridge"
-        ?"forestBridge"
-        :"mission";
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    runtimeState.player.x=45;
-    runtimeState.player.y=H*.53;
-
-    runtimeState.worldFlags={
-      bridgeCrossed:false,
-      westExitOpened:false
-    };
-
-    WorldReconstructor.populateCurrentPhase();
-
-    DoraemonSystem.commitCheckpoint();
-
-    closeModal();
-
-    updateObjective();
-  },
-
-
-  onEnemyDefeated(result){
-
-    const mission=this.currentMission();
-
-    if(!mission)return;
-
-    const ms=S.missions[mission.id];
-
-    if(
-      result.missionId!==mission.id
-    ){
-      return;
-    }
-
-
-    if(result.boss){
-
-      ms.bossDefeated=true;
-
-      this.advancePhaseFromEngine(
-        "bossDefeated"
-      );
-
-      DoraemonSystem.commitCheckpoint();
-
-      return;
-    }
-
-
-    ms.progress++;
-
-    const phase=mission.phases[ms.phase];
-
-    if(
-      phase?.enemyCount &&
-      ms.progress>=phase.enemyCount &&
-      runtimeState.entities.length===0
-    ){
-
-      this.advancePhaseFromEngine(
-        "enemyObjectiveComplete"
-      );
-
-      DoraemonSystem.commitCheckpoint();
-    }
-  },
-
-
-  onTraversalResolved(result){
-
-    const mission=this.currentMission();
-
-    if(!mission)return;
-
-    const ms=S.missions[mission.id];
-
-    const phase=mission.phases[ms.phase];
-
-    if(
-      result.gateId==="brokenBridge" &&
-      phase?.traversalGate==="brokenBridge"
-    ){
-
-      ms.phase=phase.next;
-
-      runtimeState.scene="mission";
-
-      runtimeState.worldFlags.bridgeCrossed=true;
-
-      runtimeState.player.x=Math.min(
-        W*.78,
-        runtimeState.player.x+50
-      );
-
-      WorldReconstructor.populateCurrentPhase();
-
-      DoraemonSystem.commitCheckpoint();
-
-      say(
-        "Bridge crossed — pursue the Canopy Stalker."
-      );
-    }
-  },
-
-
-  onReturnGateCrossed(result){
-
-    const mission=this.currentMission();
-
-    if(!mission)return;
-
-    const ms=S.missions[mission.id];
-
-    const phase=mission.phases[ms.phase];
-
-    if(
-      phase?.returnGate==="west" &&
-      result.gateId==="west"
-    ){
-
-      this.completeMission(mission.id);
-    }
-  },
-
-
-  onInteractionResolved(result){
-
-    if(!result.success)return;
-
-    if(
-      S.campaign.currentMissionId
-    ){
-      return;
-    }
-
-    if(result.target==="board"){
-      board();
-    }
-
-    if(result.target==="tree"){
-      tree();
-    }
-
-    if(result.target==="scan"){
-      scan();
-    }
-
-    if(result.target==="chamber"){
-      chamber();
-    }
-  },
-
-
-  onPlayerDefeated(){
-
-    DoraemonSystem.restoreCheckpoint();
-  },
-
-
-  advancePhaseFromEngine(reason){
-
-    const mission=this.currentMission();
-
-    if(!mission)return;
-
-    const ms=S.missions[mission.id];
-
-    const phase=mission.phases[ms.phase];
-
-    if(!phase?.next)return;
-
-    ms.phase=phase.next;
-
-    ms.progress=0;
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    WorldReconstructor.populateCurrentPhase();
-
-    updateObjective();
-  },
-
-
-  completeMission(id){
-
-    const mission=MISSIONS[id];
-
-    if(!mission)return;
-
-    const ms=S.missions[id];
-
-    if(ms.rewardApplied){
-      return;
-    }
-
-    ms.rewardApplied=true;
-    ms.status="completed";
-    ms.phase="completed";
-
-    S.player.xp+=mission.rewardXP;
-    S.player.tp+=mission.rewardTP;
-
-    /*
-     Mission 1 makes Pressure Burst available through
-     the technique tree; the player purchases it with TP.
-     Later discoveries are unlocked at their authored
-     discovery points.
-    */
-
-    if(
-      mission.id!=="valleyGate"
-    ){
-
-      S.player.techniques[
-        mission.techniqueRewardId
-      ]=true;
-    }
-
-    if(mission.id==="valleyGate"){
-      S.dojo.tChamberUnlocked=true;
-    }
-
-    const nextMission=
-      Object.values(MISSIONS)
-        .find(m=>m.number===mission.number+1);
-
-    if(nextMission){
-      S.missions[nextMission.id].status="available";
-      S.missions[nextMission.id].phase="available";
-    }
-
-    SaveSystem.persist(S);
-
-    open(`
-      <h2>MISSION ${mission.number} COMPLETE</h2>
-      <p><b>${mission.title}</b></p>
-
-      <p class="green">
-        +${mission.rewardXP} XP<br>
-        +${mission.rewardTP} TP
-        ${mission.id==="valleyGate"
-          ?"<br>Pressure Burst is now available in the Technique Tree."
-          :`<br>${TECHNIQUES[mission.techniqueRewardId].name} mastered.`}
-        ${nextMission
-          ?`<br>Mission ${nextMission.number} available.`
-          :"<br><b>CAMPAIGN COMPLETE</b>"}
-      </p>
-
-      <button onclick="window.returnHome()">
-        Return to Dojo
-      </button>
-    `);
-  }
-
-};
-
-
-/* ============================================================
-   DISCOVERY SYSTEM
-   ============================================================ */
-
-const DiscoverySystem={
-
-  discoverTechnique(id){
-
-    const technique=TECHNIQUES[id];
-
-    if(!technique)return;
-
-    S.player.techniques[id]=true;
-
-    const mission=CampaignSystem.currentMission();
-
-    if(mission){
-      S.missions[mission.id].discovery=true;
-    }
-
-    if(!S.codex.entries.includes(id)){
-      S.codex.entries.push(id);
-    }
-
-    SaveSystem.persist(S);
-
-    open(`
-      <h2>STORM TECHNIQUE DISCOVERED</h2>
-
-      <p>
-        <b>${technique.name}</b>
-        · ${technique.force}
-      </p>
-
-      <p>${technique.role}</p>
-
-      <p class="green">
-        The technique is now available.
-      </p>
-
-      <button onclick="window.closeModal()">
-        Continue
-      </button>
-    `);
-  }
-
-};
-
-
-/* ============================================================
-   SCOUTER
-   ============================================================ */
-
-const ScouterSystem={
-
-  onTechniqueResolved(result){
-
-    if(!result.techniqueId){
-      return;
-    }
-
-    const id=result.techniqueId;
-
-    const record=
-      S.scouter.techniques[id] ??
-      {
-        attempts:0,
-        successes:0,
-        energySpent:0,
-        bestReactionMs:null,
-        deflections:0,
-        traversals:0
-      };
-
-    record.attempts++;
-
-    if(result.success){
-      record.successes++;
-    }
-
-    record.energySpent+=
-      result.energySpent||0;
-
-    const reaction=
-      result.timing?.reactionMs;
-
-    if(
-      Number.isFinite(reaction) &&
-      (
-        record.bestReactionMs===null ||
-        reaction<record.bestReactionMs
-      )
-    ){
-      record.bestReactionMs=reaction;
-    }
-
-    if(
-      result.interaction?.tags?.includes(
-        "deflection"
-      )
-    ){
-      record.deflections++;
-    }
-
-    if(
-      result.collisionResult?.crossedTraversalGate
-    ){
-      record.traversals++;
-    }
-
-    S.scouter.techniques[id]=record;
-
-    SaveSystem.persist(S);
-  },
-
-
-  onEnemyDefeated(){
-    S.scouter.kills++;
-    SaveSystem.persist(S);
-  },
-
-
-  onProjectileDeflected(){
-    S.scouter.deflections++;
-    SaveSystem.persist(S);
-  },
-
-
-  onTraversal(){
-    S.scouter.traversals++;
-    SaveSystem.persist(S);
-  }
-
-};
-
-
-/* ============================================================
-   CODEX
-   ============================================================ */
-
-const CodexSystem={
-
-  onTechniqueResolved(result){
-
-    if(
-      result.success &&
-      result.techniqueId &&
-      !S.codex.entries.includes(result.techniqueId)
-    ){
-
-      S.codex.entries.push(
-        result.techniqueId
-      );
-
-      SaveSystem.persist(S);
-    }
-  },
-
-
-  onEnemyDefeated(result){
-
-    const id=`enemy:${result.enemyType}`;
-
-    if(!S.codex.entries.includes(id)){
-
-      S.codex.entries.push(id);
-
-      SaveSystem.persist(S);
-    }
   }
 };
-
-
-/* ============================================================
-   T-CHAMBER
-   ============================================================ */
-
-const TChamberSystem={
-
-  activeTechnique:null,
-
-  onTechniqueResolved(result){
-
-    if(
-      runtimeState.scene!=="training" ||
-      !result.techniqueId
-    ){
-      return;
-    }
-
-    const id=result.techniqueId;
-
-    if(
-      id!==this.activeTechnique
-    ){
-      return;
-    }
-
-    const current=
-      Number(S.drills[id]||0);
-
-    if(result.success){
-
-      S.drills[id]=current+1;
-
-      SaveSystem.persist(S);
-
-      say(
-        `T-CHAMBER — ${TECHNIQUES[id].name} result recorded.`
-      );
-    }
-  },
-
-
-  enter(id){
-
-    if(!S.dojo.tChamberUnlocked){
-      say("T-CHAMBER LOCKED — complete Valley Gate.");
-      return;
-    }
-
-    if(!S.player.techniques[id]){
-      say("Technique is not yet available.");
-      return;
-    }
-
-    this.activeTechnique=id;
-
-    runtimeState.scene="training";
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    runtimeState.player.x=W*.5;
-    runtimeState.player.y=H*.55;
-
-    closeModal();
-
-    say(
-      `T-CHAMBER — Practice ${TECHNIQUES[id].name}.`
-    );
-  },
-
-
-  exit(){
-
-    this.activeTechnique=null;
-
-    returnHome();
-  }
-
-};
-
-
-/* ============================================================
-   EFFECTS
-   ============================================================ */
-
-const EffectsSystem={
-
-  particles:[],
-
-  emitBurst(x,y,color,count){
-
-    /*
-     Effects are disposable presentation state.
-     They never influence simulation.
-    */
-
-    for(let i=0;i<count;i++){
-
-      const angle=Math.random()*Math.PI*2;
-      const velocity=45+Math.random()*140;
-
-      this.particles.push({
-
-        x,
-        y,
-
-        vx:Math.cos(angle)*velocity,
-        vy:Math.sin(angle)*velocity,
-
-        life:.25+Math.random()*.45,
-
-        radius:2+Math.random()*3,
-
-        color
-      });
-    }
-  },
-
-
-  onTechniqueResolved(){},
-  onEnemyDefeated(){},
-  onProjectileDeflected(){}
-};
-
-
-/* ============================================================
-   DORAEMON / RECOVERY
-   ============================================================ */
-
-const DoraemonSystem={
-
-  paused:false,
-
-
-  pause(reason){
-
-    if(this.paused)return;
-
-    this.paused=true;
-
-    clearInput();
-
-    open(`
-      <h2>PAUSED</h2>
-
-      <p>${reason}</p>
-
-      <button onclick="window.resumeGame()">
-        Resume
-      </button>
-
-      <button class="alt"
-              onclick="window.restartCheckpoint()">
-        Restart Checkpoint
-      </button>
-
-      <button class="alt"
-              onclick="window.returnHome()">
-        Return to Dojo
-      </button>
-    `);
-  },
-
-
-  resume(){
-
-    this.paused=false;
-
-    closeModal();
-
-    lastFrameTime=performance.now();
-  },
-
-
-  commitCheckpoint(){
-
-    if(
-      runtimeState.scene==="home" ||
-      runtimeState.scene==="training"
-    ){
-      return;
-    }
-
-    S.campaign.scene=runtimeState.scene;
-
-    S.campaign.checkpoint={
-      scene:runtimeState.scene,
-
-      x:runtimeState.player.x/W,
-      y:runtimeState.player.y/H
-    };
-
-    const mission=
-      CampaignSystem.currentMission();
-
-    if(mission){
-
-      S.missions[mission.id].checkpoint={
-        phase:S.missions[mission.id].phase,
-        progress:S.missions[mission.id].progress
-      };
-    }
-
-    SaveSystem.persist(S);
-  },
-
-
-  restoreCheckpoint(){
-
-    const cp=
-      S.campaign.checkpoint||
-      {
-        scene:"home",
-        x:.5,
-        y:.55
-      };
-
-    runtimeState.scene=cp.scene;
-
-    runtimeState.player.x=cp.x*W;
-    runtimeState.player.y=cp.y*H;
-
-    runtimeState.player.hp=100;
-    runtimeState.player.energy=100;
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    WorldReconstructor.populateCurrentPhase();
-
-    say("Checkpoint restored safely.");
-
-    SaveSystem.persist(S);
-  },
-
-
-  onTechniqueResolved(result){
-
-    if(result.success){
-      SaveSystem.persist(S);
-    }
-  }
-};
-
-
-/* ============================================================
-   WORLD RECONSTRUCTOR
-   ============================================================ */
-
-const WorldReconstructor={
-
-  build(snapshot){
-
-    S=SnapshotValidator.validate(
-      clone(snapshot)
-    );
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    runtimeState.scene=
-      S.campaign.scene||"home";
-
-    runtimeState.player.x=
-      S.campaign.checkpoint.x*W;
-
-    runtimeState.player.y=
-      S.campaign.checkpoint.y*H;
-
-    runtimeState.player.hp=100;
-    runtimeState.player.energy=100;
-
-    this.populateCurrentPhase();
-  },
-
-
-  populateCurrentPhase(){
-
-    runtimeState.entities=[];
-    runtimeState.projectiles=[];
-
-    const mission=
-      CampaignSystem.currentMission();
-
-    if(!mission){
-      return;
-    }
-
-    const ms=S.missions[mission.id];
-
-    const phase=
-      mission.phases[ms.phase];
-
-    if(!phase){
-      return;
-    }
-
-
-    /*
-     Discovery phases.
-     */
-
-    if(phase.discovery){
-
-      if(
-        !ms.discovery
-      ){
-
-        /*
-         The discovery itself is content state.
-         The actual technique becomes available through
-         the authored discovery interaction below.
-        */
-
-        runtimeState.player.x=W*.48;
-        runtimeState.player.y=H*.55;
-      }
-    }
-
-
-    /*
-     Enemy objective phases.
-     */
-
-    if(
-      phase.enemyType &&
-      phase.enemyCount
-    ){
-
-      const remaining=
-        Math.max(
-          0,
-          phase.enemyCount-ms.progress
-        );
-
-      for(let i=0;i<remaining;i++){
-
-        const angle=
-          i/Math.max(1,remaining)*
-          Math.PI*2;
-
-        const radius=
-          130+
-          (i%2)*55;
-
-        spawnEnemy(
-          phase.enemyType,
-          W*.55+Math.cos(angle)*radius,
-          H*.52+Math.sin(angle)*radius
-        );
-      }
-    }
-
-
-    /*
-     Boss phases.
-     */
-
-    if(
-      phase.bossType &&
-      !ms.bossDefeated
-    ){
-
-      spawnEnemy(
-        phase.bossType,
-        W*.74,
-        H*.5,
-        {
-          boss:true
-        }
-      );
-    }
-
-
-    /*
-     Ancient Ruins projectile trial.
-    */
-
-    if(
-      phase.projectileTrial
-    ){
-
-      for(let i=0;i<8;i++){
-
-        spawnProjectile(
-          i%2===0?W*.18:W*.82,
-          H*(.22+(i%4)*.17),
-
-          i%2===0?220:-220,
-
-          0,
-
-          true,
-
-          "ruinTrap"
-        );
-      }
-    }
-  }
-
-};
-
-
-/* ============================================================
-   EVENT REGISTRATION
-   ============================================================ */
-
-EventBus.on(
-  "techniqueResolved",
-  CampaignSystem.onTechniqueResolved?.bind(CampaignSystem)
-);
-
-EventBus.on(
-  "techniqueResolved",
-  ScouterSystem.onTechniqueResolved.bind(ScouterSystem)
-);
-
-EventBus.on(
-  "techniqueResolved",
-  CodexSystem.onTechniqueResolved.bind(CodexSystem)
-);
-
-EventBus.on(
-  "techniqueResolved",
-  TChamberSystem.onTechniqueResolved.bind(TChamberSystem)
-);
-
-EventBus.on(
-  "techniqueResolved",
-  EffectsSystem.onTechniqueResolved.bind(EffectsSystem)
-);
-
-EventBus.on(
-  "techniqueResolved",
-  DoraemonSystem.onTechniqueResolved.bind(DoraemonSystem)
-);
-
-EventBus.on(
-  "enemyDefeated",
-  CampaignSystem.onEnemyDefeated.bind(CampaignSystem)
-);
-
-EventBus.on(
-  "enemyDefeated",
-  ScouterSystem.onEnemyDefeated.bind(ScouterSystem)
-);
-
-EventBus.on(
-  "enemyDefeated",
-  CodexSystem.onEnemyDefeated.bind(CodexSystem)
-);
-
-EventBus.on(
-  "enemyDefeated",
-  EffectsSystem.onEnemyDefeated.bind(EffectsSystem)
-);
-
-EventBus.on(
-  "projectileDeflected",
-  ScouterSystem.onProjectileDeflected.bind(ScouterSystem)
-);
-
-EventBus.on(
-  "projectileDeflected",
-  EffectsSystem.onProjectileDeflected.bind(EffectsSystem)
-);
-
-EventBus.on(
-  "traversalResolved",
-  CampaignSystem.onTraversalResolved.bind(CampaignSystem)
-);
-
-EventBus.on(
-  "traversalResolved",
-  ScouterSystem.onTraversal.bind(ScouterSystem)
-);
-
-EventBus.on(
-  "returnGateCrossed",
-  CampaignSystem.onReturnGateCrossed.bind(CampaignSystem)
-);
-
-EventBus.on(
-  "playerDefeated",
-  CampaignSystem.onPlayerDefeated.bind(CampaignSystem)
-);
-
-EventBus.on(
-  "playerDamaged",
-  ()=>{
-    if(runtimeState.player.hp<=0){
-      DoraemonSystem.restoreCheckpoint();
-    }
-  }
-);
-
 
 /* ============================================================
    DOJO
@@ -3655,180 +532,1745 @@ EventBus.on(
 
 let DojoZones={};
 
-
-function resize(){
-
-  DPR=Math.min(
-    globalThis.devicePixelRatio||1,
-    2
-  );
-
-  W=innerWidth;
-  H=innerHeight;
-
-  canvas.width=W*DPR;
-  canvas.height=H*DPR;
-
-  canvas.style.width=W+"px";
-  canvas.style.height=H+"px";
-
-  ctx.setTransform(
-    DPR,0,0,DPR,0,0
-  );
-
+function buildDojoZones(){
   DojoZones={
-
-    board:{
-      x:W*.22,
-      y:H*.28,
-      radius:35,
-      label:"MISSION BOARD"
-    },
-
-    tree:{
-      x:W*.77,
-      y:H*.28,
-      radius:35,
-      label:"TECHNIQUE TREE"
-    },
-
-    scan:{
-      x:W*.22,
-      y:H*.70,
-      radius:33,
-      label:"SCOUTER"
-    },
-
-    chamber:{
-      x:W*.77,
-      y:H*.70,
-      radius:36,
-      label:"T-CHAMBER"
-    }
-
+    board:{x:W*.22,y:H*.28,radius:35,label:"MISSION BOARD"},
+    tree:{x:W*.77,y:H*.28,radius:35,label:"TECHNIQUE TREE"},
+    scan:{x:W*.22,y:H*.70,radius:33,label:"SCOUTER"},
+    chamber:{x:W*.77,y:H*.70,radius:36,label:"T-CHAMBER"}
   };
 }
-
-addEventListener("resize",resize);
-
 resize();
 
-
 /* ============================================================
-   HOME / MISSION UI
+   WORLD GEOMETRY
    ============================================================ */
 
-function say(text){
-  UI.obj.textContent=text;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+
+function bounds(p){
+  p.x=clamp(p.x,p.radius,W-p.radius);
+  p.y=clamp(p.y,p.radius,H-p.radius);
 }
 
+function spawnEnemy(type,x,y,options={}){
+  const d=ENEMIES[type];
+  if(!d)return null;
 
-function currentTechnique(){
+  const boss=!!options.boss;
+  const hp=boss
+    ?(options.hp||(
+      type==="elite"?500:
+      type==="entity"?360:
+      type==="guardian"?300:
+      type==="hunter"?240:
+      type==="mage"?280:
+      250
+    ))
+    :d.hp;
 
-  if(runtimeState.scene==="training"){
-    return TChamberSystem.activeTechnique;
+  const e={
+    id:options.id||`${type}_${Math.random().toString(36).slice(2)}`,
+    type,x,y,
+    radius:boss?25:14,
+    hp,maxHp:hp,
+    stability:boss?d.stability*2:d.stability,
+    maxStability:boss?d.stability*2:d.stability,
+    speed:boss?d.speed*1.08:d.speed,
+    damage:boss?d.damage*1.35:d.damage,
+    color:boss?"#ff9e55":d.color,
+    ranged:d.ranged,
+    boss,
+    attackCooldown:.6,
+    hitTimer:0,
+    phase:1,
+    disrupted:0
+  };
+
+  runtime.entities.push(e);
+  return e;
+}
+
+function spawnProjectile(x,y,vx,vy,enemy,source,options={}){
+  runtime.projectiles.push({
+    id:`p_${Math.random().toString(36).slice(2)}`,
+    x,y,vx,vy,
+    radius:options.radius||6,
+    lifetime:options.lifetime||3,
+    enemy:!!enemy,
+    source:source||"world",
+    resolved:false,
+    deflectable:options.deflectable!==false
+  });
+}
+
+/* ============================================================
+   VALIDATION
+   ============================================================ */
+
+const Validator={
+  validate(req){
+    if(!req||!req.type)
+      return {ok:false,rejection:result("requestRejected",{requestId:req?.id||null,reason:"invalidRequest"})};
+
+    if(req.type==="move"||req.type==="attack"||req.type==="interact")
+      return {ok:true,request:req};
+
+    if(req.type==="dash"){
+      if(runtime.player.dashTimer>0)
+        return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"dashCooldown"})};
+      if(runtime.player.energy<10)
+        return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"outOfEnergy"})};
+      return {ok:true,request:req};
+    }
+
+    if(req.type==="useTechnique"){
+      const t=TECHNIQUES[req.techniqueId];
+      if(!t)
+        return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"unknownTechnique"})};
+      if(!S.player.techniques[t.id])
+        return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"techniqueLocked",techniqueId:t.id})};
+      if(runtime.player.energy<t.cost)
+        return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"outOfEnergy",techniqueId:t.id})};
+      return {ok:true,request:req};
+    }
+
+    return {ok:false,rejection:result("requestRejected",{requestId:req.id,reason:"unknownRequest"})};
   }
+};
 
-  const unlocked=
-    Object.keys(TECHNIQUES)
-      .filter(id=>S.player.techniques[id]);
+/* ============================================================
+   T-ENGINE
+   ============================================================ */
 
-  return unlocked.length?
-    unlocked[unlocked.length-1]:
-    null;
-}
+const TEngine={
 
+  execute(req){
+    switch(req.type){
+      case "move":return this.resolveMove(req);
+      case "attack":return this.resolveAttack(req);
+      case "dash":return this.resolveDash(req);
+      case "useTechnique":return TechniqueSystem.execute(req);
+      case "interact":return this.resolveInteraction(req);
+      default:return result("requestRejected",{requestId:req.id,reason:"unsupportedExecution"});
+    }
+  },
 
-function openModal(html){
+  resolveMove(req){
+    const p=runtime.player;
+    let x=Number(req.direction?.x)||0;
+    let y=Number(req.direction?.y)||0;
+    const len=Math.hypot(x,y);
 
-  UI.panel.innerHTML=html;
+    if(len>1){x/=len;y/=len}
 
-  UI.modal.classList.add("show");
-}
+    if(len>0){
+      p.dx=x;p.dy=y;
+    }
 
+    const speed=p.dashTimer>0?680:185;
+    const old={x:p.x,y:p.y};
 
-function closeModal(){
+    /*
+     Forest broken bridge:
+     normal movement cannot cross the gap.
+     The engine, not Campaign, owns the physical barrier.
+    */
+    const mission=CampaignSystem.currentMission();
+    const phase=CampaignSystem.currentPhase();
 
-  UI.modal.classList.remove("show");
-}
+    let nx=p.x+x*speed*.016;
+    let ny=p.y+y*speed*.016;
 
+    if(
+      mission?.id==="forestPursuit" &&
+      phase?.type==="traversal" &&
+      !runtime.flags.bridgeCrossed &&
+      nx>W*.52 &&
+      p.y>H*.40
+    ){
+      nx=Math.min(nx,W*.52);
+    }
 
-window.closeModal=closeModal;
+    p.x=nx;p.y=ny;
+    bounds(p);
 
+    p.airborne=
+      mission?.id==="forestPursuit" &&
+      phase?.type==="traversal" &&
+      p.y<H*.45;
 
-function board(){
+    return result("movementResolved",{
+      requestId:req.id,
+      actorId:"player",
+      applied:true,
+      movementResult:{
+        startPosition:old,
+        endPosition:{x:p.x,y:p.y},
+        distanceMoved:Math.hypot(p.x-old.x,p.y-old.y)
+      }
+    });
+  },
 
-  let html="<h2>Mission Board</h2>";
+  resolveDash(req){
+    const p=runtime.player;
 
-  for(const mission of Object.values(MISSIONS)){
+    if(p.dashTimer>0)
+      return result("dashResolved",{requestId:req.id,activated:false,success:false,energySpent:0});
 
-    const ms=S.missions[mission.id];
+    if(p.energy<10)
+      return result("dashResolved",{requestId:req.id,activated:false,success:false,energySpent:0,failureReason:"outOfEnergy"});
 
-    let stateText=
-      ms.status==="completed"
-        ?"Completed"
-        :ms.status==="active"
-          ?"Active"
-          :ms.status==="available"
-            ?"Available"
-            :"Locked";
+    p.energy-=10;
+    p.dashTimer=.20;
+    p.invulnerable=.20;
 
-    html+=`
-      <div class="node ${
-        ms.status==="completed"||
-        ms.status==="available"
-          ?"on":"lock"
-      }">
+    const old={x:p.x,y:p.y};
 
-        <b>${mission.number}. ${mission.title}</b>
+    p.x+=p.dx*95;
+    p.y+=p.dy*95;
+    bounds(p);
 
-        <br>
+    return result("dashResolved",{
+      requestId:req.id,
+      activated:true,
+      success:true,
+      energySpent:10,
+      movementResult:{
+        startPosition:old,
+        endPosition:{x:p.x,y:p.y},
+        distanceMoved:Math.hypot(p.x-old.x,p.y-old.y)
+      }
+    });
+  },
 
-        ${mission.problem}
+  resolveAttack(req){
+    const p=runtime.player;
 
-        <br>
+    /*
+     Basic attack creates a real projectile.
+     It does not directly decide a hit.
+    */
+    spawnProjectile(
+      p.x+p.dx*20,
+      p.y+p.dy*20,
+      p.dx*430,
+      p.dy*430,
+      false,
+      "basicAttack",
+      {lifetime:1.8}
+    );
 
-        <span class="${
-          ms.status==="available"||
-          ms.status==="completed"
-            ?"green":"amber"
-        }">
-          ${stateText}
-        </span>
+    return result("attackResolved",{
+      requestId:req.id,
+      actorId:"player",
+      activated:true,
+      success:true,
+      damage:0,
+      targetsAffected:[],
+      projectileCreated:true
+    });
+  },
 
-        ${
-          ms.status==="available"
-            ?`
-              <br>
-              <button
-                onclick="window.startMission('${mission.id}')">
-                Start Mission
-              </button>
-            `
-            :""
+  resolveInteraction(req){
+    return result("interactionResolved",{
+      requestId:req.id,
+      success:true,
+      target:req.target||null
+    });
+  },
+
+  applyDamage(target,damage,stabilityDamage,kx,ky,sourceResult){
+    if(!target)return;
+
+    target.hp-=damage;
+    target.stability-=stabilityDamage;
+    target.x+=kx||0;
+    target.y+=ky||0;
+    target.hitTimer=.12;
+
+    sourceResult.targetsAffected.push({
+      id:target.id,
+      damage,
+      stabilityDamage
+    });
+
+    let broken=false;
+
+    if(target.stability<=0){
+      broken=true;
+      target.stability=target.maxStability;
+      target.hitTimer=.55;
+    }
+
+    if(target.hp<=0){
+      const defeated=result("enemyDefeated",{
+        enemyId:target.id,
+        enemyType:target.type,
+        boss:target.boss,
+        defeatedBy:{
+          actorId:"player",
+          source:sourceResult.techniqueId||"basicAttack"
+        },
+        combatResult:{
+          damageTaken:damage,
+          stabilityBroken:broken,
+          remainingHP:0
+        },
+        missionId:S.campaign.currentMissionId
+      });
+
+      const index=runtime.entities.indexOf(target);
+      if(index>=0)runtime.entities.splice(index,1);
+
+      EventBus.emit(defeated);
+    }
+  },
+
+  resolvePlayerProjectile(projectile){
+    const p=runtime.player;
+
+    if(distance(projectile,p)>p.radius+projectile.radius+5)
+      return false;
+
+    if(p.invulnerable>0){
+      projectile.resolved=true;
+      return true;
+    }
+
+    if(p.guardTimer>0 && projectile.deflectable){
+      projectile.enemy=false;
+      projectile.vx=-projectile.vx*1.15;
+      projectile.vy=-projectile.vy*1.15;
+      projectile.source="spiralGuardDeflect";
+
+      EventBus.emit(result("projectileDeflected",{
+        projectileId:projectile.id,
+        actorId:"player",
+        source:projectile.source,
+        success:true
+      }));
+
+      return true;
+    }
+
+    p.hp-=7;
+    projectile.resolved=true;
+
+    EventBus.emit(result("playerDamaged",{
+      damage:7,
+      source:projectile.source,
+      hpRemaining:Math.max(0,p.hp)
+    }));
+
+    return true;
+  },
+
+  resolveEnemyContact(e){
+    const p=runtime.player;
+    if(distance(e,p)>e.radius+p.radius+5)return;
+    if(e.attackCooldown>0)return;
+
+    e.attackCooldown=.82;
+
+    if(p.guardTimer>0){
+      e.stability-=36;
+
+      EventBus.emit(result("guardContactResolved",{
+        enemyId:e.id,
+        stabilityDamage:36,
+        success:true
+      }));
+
+      if(e.stability<=0){
+        e.stability=e.maxStability;
+        EventBus.emit(result("enemyStabilityBroken",{
+          enemyId:e.id,
+          source:"spiralGuard"
+        }));
+      }
+      return;
+    }
+
+    if(p.invulnerable<=0){
+      p.hp-=e.damage;
+      EventBus.emit(result("playerDamaged",{
+        damage:e.damage,
+        source:"enemyContact",
+        enemyId:e.id,
+        hpRemaining:Math.max(0,p.hp)
+      }));
+    }
+  },
+
+  updateEnemy(e,dt){
+    const p=runtime.player;
+
+    e.attackCooldown-=dt;
+    e.hitTimer-=dt;
+    e.disrupted=Math.max(0,e.disrupted-dt);
+
+    const dx=p.x-e.x;
+    const dy=p.y-e.y;
+    const d=Math.hypot(dx,dy)||1;
+
+    const speed=e.disrupted>0?e.speed*.35:e.speed;
+
+    if(e.boss){
+      this.updateBoss(e,dt,dx,dy,d,speed);
+      return;
+    }
+
+    if(e.ranged){
+      if(d>145){
+        e.x+=dx/d*speed*dt;
+        e.y+=dy/d*speed*dt;
+      }
+
+      if(e.attackCooldown<=0&&d<350){
+        e.attackCooldown=1.35;
+        spawnProjectile(
+          e.x,e.y,
+          dx/d*190,dy/d*190,
+          true,e.type
+        );
+      }
+    }else if(d>e.radius+p.radius+12){
+      e.x+=dx/d*speed*dt;
+      e.y+=dy/d*speed*dt;
+    }
+
+    e.stability=Math.min(e.maxStability,e.stability+9*dt);
+    bounds(e);
+    this.resolveEnemyContact(e);
+  },
+
+  updateBoss(e,dt,dx,dy,d,speed){
+    /*
+     Boss phase is engine-owned physical combat state.
+    */
+    const ratio=e.hp/e.maxHp;
+
+    e.phase=
+      ratio>.66?1:
+      ratio>.33?2:3;
+
+    const phaseSpeed=speed*(1+(e.phase-1)*.12);
+
+    if(d>110){
+      e.x+=dx/d*phaseSpeed*dt;
+      e.y+=dy/d*phaseSpeed*dt;
+    }
+
+    if(e.attackCooldown<=0&&d<420){
+      e.attackCooldown=
+        e.phase===1?1.35:
+        e.phase===2?.95:.7;
+
+      if(e.ranged||e.phase>=2){
+        const count=e.phase>=3?3:1;
+
+        for(let i=0;i<count;i++){
+          const angle=Math.atan2(dy,dx)+(i-(count-1)/2)*.18;
+          spawnProjectile(
+            e.x,e.y,
+            Math.cos(angle)*220,
+            Math.sin(angle)*220,
+            true,
+            e.type
+          );
+        }
+      }
+    }
+
+    e.stability=Math.min(e.maxStability,e.stability+6*dt);
+    bounds(e);
+    this.resolveEnemyContact(e);
+  },
+
+  updateProjectiles(dt){
+    for(let i=runtime.projectiles.length-1;i>=0;i--){
+      const p=runtime.projectiles[i];
+
+      p.x+=p.vx*dt;
+      p.y+=p.vy*dt;
+      p.lifetime-=dt;
+
+      if(p.resolved||p.lifetime<=0){
+        runtime.projectiles.splice(i,1);
+        continue;
+      }
+
+      if(p.enemy){
+        if(this.resolvePlayerProjectile(p)){
+          /*
+           A deflected projectile remains alive.
+           A damaging/resolved projectile is removed.
+          */
+          if(p.resolved)runtime.projectiles.splice(i,1);
+          continue;
+        }
+      }else{
+        let target=null;
+
+        for(const e of [...runtime.entities]){
+          if(distance(p,e)<p.radius+e.radius){
+            target=e;
+            break;
+          }
         }
 
+        if(target){
+          const r=result("projectileHitResolved",{
+            projectileId:p.id,
+            actorId:"player",
+            techniqueId:
+              p.source==="spiralGuardDeflect"
+                ?"spiralGuard":null,
+            targetsAffected:[]
+          });
+
+          this.applyDamage(
+            target,
+            p.source==="spiralGuardDeflect"?28:16,
+            p.source==="spiralGuardDeflect"?32:18,
+            p.vx*.035,
+            p.vy*.035,
+            r
+          );
+
+          EventBus.emit(r);
+          runtime.projectiles.splice(i,1);
+          continue;
+        }
+      }
+
+      if(
+        p.x<-50||p.x>W+50||
+        p.y<-50||p.y>H+50
+      ){
+        runtime.projectiles.splice(i,1);
+      }
+    }
+  },
+
+  update(dt){
+    const p=runtime.player;
+
+    p.dashTimer=Math.max(0,p.dashTimer-dt);
+    p.invulnerable=Math.max(0,p.invulnerable-dt);
+    p.guardTimer=Math.max(0,p.guardTimer-dt);
+
+    if(runtime.scene==="home"||runtime.scene==="training"){
+      p.energy=Math.min(p.maxEnergy,p.energy+12*dt);
+      return;
+    }
+
+    p.energy=Math.min(p.maxEnergy,p.energy+8*dt);
+
+    for(const e of [...runtime.entities])
+      this.updateEnemy(e,dt);
+
+    this.updateProjectiles(dt);
+
+    CampaignSystem.updateWorld(dt);
+
+    if(p.hp<=0){
+      EventBus.emit(result("playerDefeated",{checkpointAvailable:true}));
+    }
+  }
+};
+
+/* ============================================================
+   TECHNIQUE SYSTEM
+   ============================================================ */
+
+const TechniqueSystem={
+
+  execute(req){
+    const t=TECHNIQUES[req.techniqueId];
+    const p=runtime.player;
+
+    const r=result("techniqueResolved",{
+      requestId:req.id,
+      techniqueId:t.id,
+      actorId:"player",
+      requestedAt:req.timestamp,
+      resolvedAt:performance.now(),
+      activated:false,
+      success:false,
+      failureReason:null,
+      energySpent:0,
+      cooldownStarted:false,
+      timing:{
+        reactionMs:Math.max(0,performance.now()-req.timestamp),
+        grade:"good"
+      },
+      movementResult:null,
+      collisionResult:null,
+      targetsAffected:[],
+      interaction:null,
+      environmentalEffect:null
+    });
+
+    if(p.energy<t.cost){
+      r.failureReason="outOfEnergy";
+      return r;
+    }
+
+    if(
+      runtime.techCooldowns?.[t.id]>0
+    ){
+      r.failureReason="cooldown";
+      return r;
+    }
+
+    const handler=TECHNIQUE_HANDLERS[t.handlerId];
+
+    if(typeof handler!=="function"){
+      r.failureReason="missingHandler";
+      return r;
+    }
+
+    const preEnergy=p.energy;
+    const ok=handler(t,r);
+
+    if(!ok){
+      p.energy=preEnergy;
+      r.energySpent=0;
+      r.activated=false;
+      return r;
+    }
+
+    p.energy-=t.cost;
+    r.energySpent=t.cost;
+    r.activated=true;
+    r.cooldownStarted=true;
+
+    runtime.techCooldowns[t.id]=t.cooldown;
+
+    return r;
+  }
+};
+
+runtime.techCooldowns={};
+
+/* ============================================================
+   TECHNIQUE HANDLERS
+   ============================================================ */
+
+const TECHNIQUE_HANDLERS={
+
+  pressureBurst(t,r){
+    const p=runtime.player;
+    let affected=0;
+
+    for(const e of [...runtime.entities]){
+      const d=distance(p,e);
+      if(d<175){
+        const dx=e.x-p.x;
+        const dy=e.y-p.y;
+        const len=Math.hypot(dx,dy)||1;
+
+        TEngine.applyDamage(
+          e,28,35,
+          dx/len*105,
+          dy/len*105,
+          r
+        );
+        affected++;
+      }
+    }
+
+    r.success=affected>0;
+    r.interaction={
+      category:"crowdControl",
+      tags:["pressure","spaceCreation"]
+    };
+
+    Effects.emitBurst(p.x,p.y,"#c38cff",35);
+    return true;
+  },
+
+  airStep(t,r){
+    const p=runtime.player;
+
+    if(!p.airborne){
+      r.failureReason="requiresAirborne";
+      return false;
+    }
+
+    const start={x:p.x,y:p.y};
+
+    p.x+=p.dx*150;
+    p.y+=p.dy*150;
+    bounds(p);
+
+    const crossed=
+      CampaignSystem.currentMission()?.id==="forestPursuit" &&
+      CampaignSystem.currentPhase()?.type==="traversal" &&
+      !runtime.flags.bridgeCrossed &&
+      p.x>W*.62;
+
+    if(crossed){
+      p.x=Math.max(p.x,W*.64);
+    }
+
+    p.airborne=false;
+
+    r.success=true;
+    r.movementResult={
+      applied:true,
+      startPosition:start,
+      endPosition:{x:p.x,y:p.y},
+      distanceMoved:Math.hypot(p.x-start.x,p.y-start.y),
+      wasAirborne:true,
+      landed:true
+    };
+
+    r.collisionResult={
+      crossedTraversalGate:crossed,
+      traversalGate:crossed?"brokenBridge":null
+    };
+
+    r.interaction={
+      category:"traversal",
+      tags:["airborne","aerialMobility"]
+    };
+
+    Effects.emitBurst(p.x,p.y,"#6ceeff",24);
+    return true;
+  },
+
+  vortex(t,r){
+    const p=runtime.player;
+    let affected=0;
+
+    for(const e of [...runtime.entities]){
+      const d=distance(p,e);
+
+      if(d<235){
+        const dx=p.x-e.x;
+        const dy=p.y-e.y;
+        const len=Math.hypot(dx,dy)||1;
+
+        TEngine.applyDamage(
+          e,20,50,
+          dx/len*82,
+          dy/len*82,
+          r
+        );
+        affected++;
+      }
+    }
+
+    r.success=affected>0;
+    r.interaction={
+      category:"groupControl",
+      tags:["rotation","pull","formationBreak"]
+    };
+
+    Effects.emitBurst(p.x,p.y,"#ffd46a",42);
+    return true;
+  },
+
+  spiralGuard(t,r){
+    runtime.player.guardTimer=.72;
+
+    r.success=true;
+    r.interaction={
+      category:"activeDefense",
+      tags:["deflection","guard","projectileControl"]
+    };
+
+    Effects.emitBurst(
+      runtime.player.x,
+      runtime.player.y,
+      "#8fffe2",
+      20
+    );
+
+    return true;
+  },
+
+  turbulence(t,r){
+    const p=runtime.player;
+
+    for(const e of runtime.entities){
+      if(distance(p,e)<220){
+        e.disrupted=2.2;
+        e.attackCooldown=Math.max(e.attackCooldown,1);
+
+        r.targetsAffected.push({
+          id:e.id,
+          disrupted:true,
+          duration:2.2
+        });
+      }
+    }
+
+    r.success=r.targetsAffected.length>0;
+    r.interaction={
+      category:"disruption",
+      tags:["turbulence","instability","accuracyBreak"]
+    };
+
+    Effects.emitBurst(p.x,p.y,"#ff77b9",40);
+    return true;
+  },
+
+  tempest(t,r){
+    const p=runtime.player;
+    let affected=0;
+
+    for(const e of [...runtime.entities]){
+      const d=distance(p,e);
+
+      if(d<280){
+        const dx=e.x-p.x;
+        const dy=e.y-p.y;
+        const len=Math.hypot(dx,dy)||1;
+
+        TEngine.applyDamage(
+          e,46,85,
+          dx/len*145,
+          dy/len*145,
+          r
+        );
+
+        affected++;
+      }
+    }
+
+    r.success=affected>0;
+
+    /*
+     Tempest is synthesis:
+     it records the four force concepts rather than
+     simply being "the strongest attack".
+    */
+    r.interaction={
+      category:"synthesis",
+      tags:["wind","pressure","rotation","turbulence"]
+    };
+
+    Effects.emitBurst(p.x,p.y,"#f6e17a",65);
+    return true;
+  }
+};
+
+/* ============================================================
+   CAMPAIGN ENGINE
+   ============================================================ */
+
+const CampaignSystem={
+
+  currentMission(){
+    return S.campaign.currentMissionId
+      ?MISSIONS[S.campaign.currentMissionId]
+      :null;
+  },
+
+  currentState(){
+    const m=this.currentMission();
+    return m?S.missions[m.id]:null;
+  },
+
+  currentPhase(){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    return m&&ms?m.phases[ms.phase]:null;
+  },
+
+  startMission(id){
+    const m=MISSIONS[id];
+    const ms=S.missions[id];
+
+    if(!m||!ms)return;
+
+    if(ms.status!=="available"&&ms.status!=="active")
+      return;
+
+    S.campaign.currentMissionId=id;
+    ms.status="active";
+
+    if(ms.phase==="available"||!m.phases[ms.phase])
+      ms.phase=Object.keys(m.phases)[0];
+
+    runtime.scene="mission";
+    runtime.entities=[];
+    runtime.projectiles=[];
+    runtime.flags={bridgeCrossed:false};
+
+    runtime.player.x=W*.12;
+    runtime.player.y=H*.54;
+    runtime.player.hp=100;
+    runtime.player.energy=100;
+
+    WorldReconstructor.populate();
+
+    Doraemon.commitCheckpoint();
+
+    closeModal();
+    updateObjective();
+  },
+
+  advance(reason){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(!m||!ms||!phase||!phase.next)return;
+
+    ms.phase=phase.next;
+    ms.progress=0;
+    ms.phaseTimer=0;
+
+    runtime.entities=[];
+    runtime.projectiles=[];
+
+    WorldReconstructor.populate();
+    Doraemon.commitCheckpoint();
+
+    say(`PHASE COMPLETE — ${reason}`);
+  },
+
+  onEnemyDefeated(r){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(!m||!ms||r.missionId!==m.id)return;
+
+    if(phase?.type==="boss"){
+      if(r.boss){
+        ms.bossDefeated=true;
+        this.advance("Boss defeated");
+      }
+      return;
+    }
+
+    if(phase?.type==="enemyWave"){
+      ms.progress++;
+
+      if(ms.progress>=phase.enemyCount){
+        this.advance("Enemy objective complete");
+      }
+    }
+  },
+
+  onTraversal(r){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(
+      !m||!ms||
+      phase?.type!=="traversal"||
+      r.gateId!==phase.gate
+    )return;
+
+    runtime.flags.bridgeCrossed=true;
+    this.advance("Traversal gate crossed");
+  },
+
+  onReturn(r){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(
+      !m||!ms||
+      phase?.type!=="returnGate"||
+      r.gateId!==phase.gate
+    )return;
+
+    this.complete(m.id);
+  },
+
+  onDiscovery(id){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(
+      !m||!ms||
+      phase?.type!=="discovery"||
+      phase.technique!==id
+    )return;
+
+    DiscoverySystem.discover(id);
+  },
+
+  updateWorld(dt){
+    const m=this.currentMission();
+    const ms=this.currentState();
+    const phase=this.currentPhase();
+
+    if(!m||!ms||!phase)return;
+
+    /*
+     Travel phases advance when the player reaches the
+     authored destination. The engine determines position;
+     Campaign interprets that fact.
+    */
+    if(phase.type==="travel"){
+      if(runtime.player.x>W*.78){
+        this.advance("Destination reached");
+      }
+    }
+
+    if(phase.type==="discovery"){
+      /*
+       Discovery interaction is handled by the authored
+       discovery marker in this campaign layer.
+      */
+    }
+
+    if(phase.type==="traversal"){
+      if(
+        m.id==="forestPursuit" &&
+        runtime.player.x>W*.64 &&
+        runtime.player.y<H*.46 &&
+        runtime.flags.bridgeCrossed===false
+      ){
+        if(
+          runtime.player.airborne
+        ){
+          /*
+           Actual crossing requires Air Step to have been
+           physically executed. Air Step itself reports
+           movement; this gate confirms final position.
+          */
+          EventBus.emit(result("traversalResolved",{
+            missionId:m.id,
+            gateId:"brokenBridge",
+            actorId:"player",
+            success:true,
+            position:{
+              x:runtime.player.x,
+              y:runtime.player.y
+            }
+          }));
+        }
+      }
+    }
+
+    if(phase.type==="projectileTrial"){
+      /*
+       Projectile deflections are counted by the consumer.
+       When the target is met, phase advances.
+      */
+      if(ms.deflections>=phase.target)
+        this.advance("Projectile trial complete");
+    }
+
+    if(phase.type==="hazard"){
+      ms.phaseTimer+=dt;
+
+      /*
+       Surviving is physical truth: HP must remain above zero.
+      */
+      if(ms.phaseTimer>=phase.duration)
+        this.advance("Core field survived");
+    }
+
+    if(phase.type==="returnGate"){
+      if(runtime.player.x<W*.08){
+        EventBus.emit(result("returnGateCrossed",{
+          missionId:m.id,
+          gateId:phase.gate,
+          success:true
+        }));
+      }
+    }
+
+    if(phase.type==="complete"){
+      /*
+       Mission 6 has a genuine ending.
+       */
+      if(m.id==="tempestCitadel"){
+        if(!S.missions[m.id].rewardApplied)
+          this.complete(m.id);
+      }
+    }
+  },
+
+  complete(id){
+    const m=MISSIONS[id];
+    const ms=S.missions[id];
+
+    if(!m||!ms||ms.rewardApplied)return;
+
+    ms.rewardApplied=true;
+    ms.status="completed";
+    ms.phase="completed";
+
+    S.player.xp+=m.reward.xp;
+    S.player.tp+=m.reward.tp;
+
+    if(id==="valleyGate"){
+      S.dojo.tChamberUnlocked=true;
+    }
+
+    if(m.techniqueReward){
+      S.player.techniques[m.techniqueReward]=true;
+      if(!S.codex.entries.includes(m.techniqueReward))
+        S.codex.entries.push(m.techniqueReward);
+    }
+
+    const next=MISSION_IDS
+      .map(x=>MISSIONS[x])
+      .find(x=>x.number===m.number+1);
+
+    if(next){
+      S.missions[next.id].status="available";
+      if(S.missions[next.id].phase==="locked")
+        S.missions[next.id].phase="available";
+    }
+
+    S.campaign.currentMissionId=null;
+    S.campaign.scene="home";
+    S.campaign.checkpoint={
+      scene:"home",x:.5,y:.54
+    };
+
+    runtime.scene="home";
+    runtime.entities=[];
+    runtime.projectiles=[];
+    runtime.player.x=W*.5;
+    runtime.player.y=H*.54;
+    runtime.player.hp=100;
+    runtime.player.energy=100;
+
+    SaveSystem.persist();
+
+    let message=`
+      <h2>MISSION ${m.number} COMPLETE</h2>
+      <p><b>${m.title}</b></p>
+      <p class="green">
+        +${m.reward.xp} XP<br>
+        +${m.reward.tp} TP
+      </p>
+    `;
+
+    if(id==="valleyGate"){
+      message+=`
+        <p>
+          T-Chamber unlocked.<br>
+          Pressure Burst can now be learned from the Technique Tree.
+        </p>
+      `;
+    }else{
+      message+=`
+        <p class="green">
+          ${TECHNIQUES[m.techniqueReward].name} permanently learned.
+        </p>
+      `;
+    }
+
+    if(next){
+      message+=`<p>Mission ${next.number} is now available.</p>`;
+    }else{
+      message+=`
+        <p class="green">
+          <b>CAMPAIGN COMPLETE — TEMPEST CITADEL</b>
+        </p>
+      `;
+    }
+
+    message+=`
+      <button onclick="window.closeModal()">Continue</button>
+    `;
+
+    openModal(message);
+  }
+};
+
+/* ============================================================
+   DISCOVERY
+   ============================================================ */
+
+const DiscoverySystem={
+
+  discover(id){
+    const t=TECHNIQUES[id];
+    const m=CampaignSystem.currentMission();
+    const ms=CampaignSystem.currentState();
+
+    if(!t||!m||!ms)return;
+
+    if(S.player.techniques[id]){
+      CampaignSystem.advance("Technique already known");
+      return;
+    }
+
+    S.player.techniques[id]=true;
+    ms.discovery=true;
+
+    if(!S.codex.entries.includes(id))
+      S.codex.entries.push(id);
+
+    SaveSystem.persist();
+
+    openModal(`
+      <h2>STORM TECHNIQUE DISCOVERED</h2>
+      <p>
+        <b>${t.name}</b> · ${t.force}
+      </p>
+      <p>${t.role}</p>
+      <p class="green">
+        First use is now available.
+      </p>
+      <button onclick="window.discoveryContinue()">
+        Continue
+      </button>
+    `);
+  }
+};
+
+window.discoveryContinue=()=>{
+  closeModal();
+  CampaignSystem.advance("Discovery completed");
+};
+
+/* ============================================================
+   WORLD RECONSTRUCTION
+   ============================================================ */
+
+const WorldReconstructor={
+
+  build(){
+    S=SnapshotValidator.validate(clone(S));
+
+    runtime.scene=S.campaign.scene||"home";
+    runtime.player.x=S.campaign.checkpoint.x*W;
+    runtime.player.y=S.campaign.checkpoint.y*H;
+    runtime.player.hp=100;
+    runtime.player.energy=100;
+
+    runtime.entities=[];
+    runtime.projectiles=[];
+    runtime.flags={bridgeCrossed:false};
+
+    const m=CampaignSystem.currentMission();
+
+    if(m){
+      const phase=CampaignSystem.currentPhase();
+
+      /*
+       A saved traversal checkpoint after bridge crossing
+       remains on the far side.
+      */
+      if(
+        m.id==="forestPursuit" &&
+        S.missions[m.id].phase!=="crossing"
+      ){
+        runtime.flags.bridgeCrossed=true;
+      }
+
+      this.populate();
+    }
+  },
+
+  populate(){
+    runtime.entities=[];
+    runtime.projectiles=[];
+
+    const m=CampaignSystem.currentMission();
+    const ms=CampaignSystem.currentState();
+    const phase=CampaignSystem.currentPhase();
+
+    if(!m||!ms||!phase)return;
+
+    if(phase.type==="enemyWave"){
+      const remaining=Math.max(
+        0,
+        phase.enemyCount-ms.progress
+      );
+
+      for(let i=0;i<remaining;i++){
+        const cols=Math.min(4,remaining);
+        const row=Math.floor(i/cols);
+        const col=i%cols;
+
+        spawnEnemy(
+          phase.enemyType,
+          W*(.48+(col-(cols-1)/2)*.12),
+          H*(.35+row*.18),
+          {id:`${m.id}_${ms.phase}_${i}`}
+        );
+      }
+    }
+
+    if(phase.type==="boss"&&!ms.bossDefeated){
+      const boss=spawnEnemy(
+        phase.bossType,
+        W*.75,
+        H*.52,
+        {
+          id:`${m.id}_boss`,
+          boss:true,
+          hp:m.id==="tempestCitadel"?500:undefined
+        }
+      );
+
+      if(boss){
+        boss.displayName=phase.bossName;
+      }
+    }
+
+    if(phase.type==="projectileTrial"){
+      for(let i=0;i<10;i++){
+        const side=i%2===0;
+        spawnProjectile(
+          side?W*.12:W*.88,
+          H*(.24+(i%5)*.13),
+          side?230:-230,
+          0,
+          true,
+          "ruinTrap",
+          {lifetime:6}
+        );
+      }
+    }
+  }
+};
+
+/* ============================================================
+   T-CHAMBER
+   ============================================================ */
+
+const TChamber={
+  active:null,
+  cueIndex:0,
+  cueTimer:0,
+
+  drills:{
+    pressureBurst:[
+      "Stand inside the pressure ring.",
+      "Wait for the cue.",
+      "Use Pressure Burst to create space."
+    ],
+    airStep:[
+      "Move into the jump lane.",
+      "Jump / become airborne.",
+      "Use Air Step toward the landing marker."
+    ],
+    vortex:[
+      "Let the targets approach.",
+      "Use Vortex when they cluster.",
+      "Break the formation."
+    ],
+    spiralGuard:[
+      "Face the incoming projectiles.",
+      "Activate Spiral Guard.",
+      "Deflect the volley."
+    ],
+    turbulence:[
+      "Enter the unstable field.",
+      "Use Turbulence near the targets.",
+      "Hold the disruption long enough."
+    ],
+    tempest:[
+      "Build a close group.",
+      "Use Tempest.",
+      "Observe the four-force synthesis."
+    ]
+  },
+
+  enter(id){
+    if(!S.dojo.tChamberUnlocked){
+      say("T-CHAMBER LOCKED — complete Valley Gate.");
+      return;
+    }
+
+    if(!S.player.techniques[id]){
+      say("That Storm technique has not been discovered.");
+      return;
+    }
+
+    this.active=id;
+    this.cueIndex=0;
+    this.cueTimer=0;
+
+    runtime.scene="training";
+    runtime.entities=[];
+    runtime.projectiles=[];
+    runtime.player.x=W*.5;
+    runtime.player.y=H*.55;
+    runtime.player.hp=100;
+    runtime.player.energy=100;
+
+    this.spawnDrill();
+    closeModal();
+    updateObjective();
+  },
+
+  spawnDrill(){
+    runtime.entities=[];
+    runtime.projectiles=[];
+
+    const id=this.active;
+
+    if(id==="airStep"){
+      runtime.player.airborne=true;
+      runtime.player.dx=1;
+      runtime.player.dy=-.15;
+    }
+
+    if(id==="pressureBurst"||id==="vortex"||id==="turbulence"||id==="tempest"){
+      for(let i=0;i<3;i++)
+        spawnEnemy("raider",W*.63+i*35,H*.45+i*35);
+    }
+
+    if(id==="spiralGuard"){
+      for(let i=0;i<8;i++)
+        spawnProjectile(
+          W*.82,
+          H*.22+i*H*.07,
+          -240,
+          0,
+          true,
+          "trainingVolley",
+          {lifetime:6}
+        );
+    }
+  },
+
+  update(dt){
+    if(runtime.scene!=="training")return;
+
+    this.cueTimer+=dt;
+
+    if(this.cueTimer>2.5){
+      this.cueTimer=0;
+      this.cueIndex++;
+    }
+  },
+
+  exit(){
+    this.active=null;
+    runtime.scene="home";
+    runtime.entities=[];
+    runtime.projectiles=[];
+    runtime.player.x=W*.5;
+    runtime.player.y=H*.54;
+    SaveSystem.persist();
+    updateObjective();
+  },
+
+  onTechnique(r){
+    if(runtime.scene!=="training"||r.techniqueId!==this.active)
+      return;
+
+    if(r.success){
+      S.drills[r.techniqueId]=Number(S.drills[r.techniqueId]||0)+1;
+      SaveSystem.persist();
+
+      say(
+        `T-CHAMBER — ${TECHNIQUES[r.techniqueId].name} success recorded.`
+      );
+    }
+  }
+};
+
+/* ============================================================
+   SCOUTER
+   ============================================================ */
+
+const Scouter={
+  onTechnique(r){
+    if(!r.techniqueId)return;
+
+    const rec=S.scouter.techniques[r.techniqueId]??={
+      attempts:0,successes:0,energySpent:0,
+      bestReactionMs:null,deflections:0,traversals:0
+    };
+
+    rec.attempts++;
+
+    if(r.success)rec.successes++;
+    rec.energySpent+=r.energySpent||0;
+
+    const ms=r.timing?.reactionMs;
+
+    if(Number.isFinite(ms)&&
+      (rec.bestReactionMs===null||ms<rec.bestReactionMs))
+      rec.bestReactionMs=ms;
+
+    if(r.interaction?.tags?.includes("deflection"))
+      rec.deflections++;
+
+    if(r.collisionResult?.crossedTraversalGate)
+      rec.traversals++;
+
+    S.scouter.techniques[r.techniqueId]=rec;
+    SaveSystem.persist();
+  },
+
+  onEnemy(){
+    S.scouter.kills++;
+    SaveSystem.persist();
+  },
+
+  onDeflection(){
+    S.scouter.deflections++;
+    SaveSystem.persist();
+  },
+
+  onTraversal(){
+    S.scouter.traversals++;
+    SaveSystem.persist();
+  }
+};
+
+/* ============================================================
+   CODEX
+   ============================================================ */
+
+const Codex={
+  onTechnique(r){
+    if(r.success&&!S.codex.entries.includes(r.techniqueId)){
+      S.codex.entries.push(r.techniqueId);
+      SaveSystem.persist();
+    }
+  },
+
+  onEnemy(r){
+    const id=`enemy:${r.enemyType}`;
+    if(!S.codex.entries.includes(id)){
+      S.codex.entries.push(id);
+      SaveSystem.persist();
+    }
+  }
+};
+
+/* ============================================================
+   EFFECTS
+   ============================================================ */
+
+const Effects={
+  particles:[],
+
+  emitBurst(x,y,color,count){
+    for(let i=0;i<count;i++){
+      const a=Math.random()*Math.PI*2;
+      const v=45+Math.random()*140;
+
+      this.particles.push({
+        x,y,
+        vx:Math.cos(a)*v,
+        vy:Math.sin(a)*v,
+        life:.25+Math.random()*.45,
+        radius:2+Math.random()*3,
+        color
+      });
+    }
+  },
+
+  update(dt){
+    for(let i=this.particles.length-1;i>=0;i--){
+      const f=this.particles[i];
+      f.x+=f.vx*dt;
+      f.y+=f.vy*dt;
+      f.vx*=.9;
+      f.vy*=.9;
+      f.life-=dt;
+      if(f.life<=0)this.particles.splice(i,1);
+    }
+  }
+};
+
+/* ============================================================
+   DORAEMON
+   ============================================================ */
+
+const Doraemon={
+  paused:false,
+
+  pause(reason){
+    if(this.paused)return;
+
+    this.paused=true;
+    clearInput();
+
+    openModal(`
+      <h2>PAUSED</h2>
+      <p>${reason}</p>
+      <button onclick="window.resumeGame()">Resume</button>
+      <button class="alt" onclick="window.restartCheckpoint()">Restart Checkpoint</button>
+      <button class="alt" onclick="window.returnHome()">Return to Dojo</button>
+    `);
+  },
+
+  resume(){
+    this.paused=false;
+    closeModal();
+    lastFrameTime=performance.now();
+  },
+
+  commitCheckpoint(){
+    if(runtime.scene==="training")return;
+
+    const m=CampaignSystem.currentMission();
+
+    S.campaign.scene=runtime.scene;
+    S.campaign.checkpoint={
+      scene:runtime.scene,
+      x:runtime.player.x/W,
+      y:runtime.player.y/H
+    };
+
+    if(m){
+      const ms=S.missions[m.id];
+      ms.checkpoint={
+        phase:ms.phase,
+        progress:ms.progress,
+        deflections:ms.deflections
+      };
+    }
+
+    SaveSystem.persist();
+  },
+
+  restoreCheckpoint(){
+    const cp=S.campaign.checkpoint;
+
+    if(!cp||cp.scene==="home"){
+      returnHome();
+      say("Returned safely to the Dojo.");
+      return;
+    }
+
+    runtime.scene=cp.scene;
+    runtime.player.x=cp.x*W;
+    runtime.player.y=cp.y*H;
+    runtime.player.hp=100;
+    runtime.player.energy=100;
+    runtime.entities=[];
+    runtime.projectiles=[];
+
+    WorldReconstructor.populate();
+
+    this.paused=false;
+    closeModal();
+    say("Checkpoint restored safely.");
+  }
+};
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+
+EventBus.on("techniqueResolved",r=>CampaignTechniqueConsumer(r));
+EventBus.on("techniqueResolved",r=>Scouter.onTechnique(r));
+EventBus.on("techniqueResolved",r=>Codex.onTechnique(r));
+EventBus.on("techniqueResolved",r=>TChamber.onTechnique(r));
+
+EventBus.on("enemyDefeated",r=>CampaignSystem.onEnemyDefeated(r));
+EventBus.on("enemyDefeated",r=>Scouter.onEnemy(r));
+EventBus.on("enemyDefeated",r=>Codex.onEnemy(r));
+
+EventBus.on("projectileDeflected",r=>Scouter.onDeflection());
+
+EventBus.on("traversalResolved",r=>CampaignSystem.onTraversal(r));
+EventBus.on("traversalResolved",r=>Scouter.onTraversal());
+
+EventBus.on("returnGateCrossed",r=>CampaignSystem.onReturn(r));
+
+EventBus.on("playerDefeated",()=>{
+  Doraemon.restoreCheckpoint();
+});
+
+EventBus.on("playerDamaged",r=>{
+  if(runtime.player.hp<=0)
+    Doraemon.restoreCheckpoint();
+});
+
+/*
+ This function exists explicitly now.
+ The old build attempted to bind an undefined
+ CampaignSystem.onTechniqueResolved function.
+ */
+function CampaignTechniqueConsumer(r){
+  /*
+   Campaign does not invent progression from technique use.
+   It only checks technique-use results against authored
+   discovery/application conditions.
+  */
+
+  const m=CampaignSystem.currentMission();
+  const ms=CampaignSystem.currentState();
+  const phase=CampaignSystem.currentPhase();
+
+  if(!m||!ms||!phase)return;
+
+  if(
+    phase.type==="traversal" &&
+    r.techniqueId==="airStep" &&
+    r.success &&
+    r.collisionResult?.crossedTraversalGate
+  ){
+    EventBus.emit(result("traversalResolved",{
+      missionId:m.id,
+      gateId:phase.gate,
+      actorId:"player",
+      success:true,
+      position:{
+        x:runtime.player.x,
+        y:runtime.player.y
+      }
+    }));
+  }
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+
+function say(t){UI.obj.textContent=t}
+function openModal(html){
+  UI.panel.innerHTML=html;
+  UI.modal.classList.add("show");
+}
+function closeModal(){UI.modal.classList.remove("show")}
+window.closeModal=closeModal;
+
+function board(){
+  let html="<h2>Mission Board</h2>";
+
+  for(const m of Object.values(MISSIONS)){
+    const ms=S.missions[m.id];
+
+    const label=
+      ms.status==="completed"?"Completed":
+      ms.status==="active"?"Active":
+      ms.status==="available"?"Available":"Locked";
+
+    html+=`
+      <div class="node ${ms.status==="completed"||ms.status==="available"?"on":"lock"}">
+        <b>${m.number}. ${m.title}</b><br>
+        ${m.problem}<br>
+        <span class="${ms.status==="locked"?"amber":"green"}">${label}</span>
+        ${
+          ms.status==="available"
+            ?`<br><button onclick="window.startMission('${m.id}')">Start Mission</button>`
+            :""
+        }
       </div>
     `;
   }
 
-  html+=`
-    <button class="alt"
-            onclick="window.closeModal()">
-      Close
-    </button>
-  `;
-
+  html+=`<button class="alt" onclick="window.closeModal()">Close</button>`;
   openModal(html);
 }
 
-
 function tree(){
-
   let html="<h2>Storm Skills</h2>";
 
   for(const t of Object.values(TECHNIQUES)){
-
     const unlocked=S.player.techniques[t.id];
 
     const purchasable=
@@ -3838,73 +2280,41 @@ function tree(){
       S.player.tp>0;
 
     html+=`
-      <div class="node ${
-        unlocked?"on":"lock"
-      }">
-
-        <b>${t.name}</b>
-        · ${t.force}
-
-        <br>
-
-        ${
-          unlocked
-            ?t.role
-            :"Locked"
-        }
-
+      <div class="node ${unlocked?"on":"lock"}">
+        <b>${t.name}</b> · ${t.force}<br>
+        ${unlocked?t.role:"Locked"}
         ${
           purchasable
-            ?`
-              <br>
-              <button
-                onclick="window.unlockPressure()">
-                Learn · 1 TP
-              </button>
-            `
+            ?`<br><button onclick="window.unlockPressure()">Learn · 1 TP</button>`
             :""
         }
-
       </div>
     `;
   }
 
-  html+=`
-    <button class="alt"
-            onclick="window.closeModal()">
-      Close
-    </button>
-  `;
-
+  html+=`<button class="alt" onclick="window.closeModal()">Close</button>`;
   openModal(html);
 }
 
-
 window.unlockPressure=()=>{
-
   if(
     S.missions.valleyGate.status!=="completed"||
     S.player.techniques.pressureBurst||
     S.player.tp<1
-  ){
-    return;
-  }
+  )return;
 
   S.player.tp--;
-
   S.player.techniques.pressureBurst=true;
+  if(!S.codex.entries.includes("pressureBurst"))
+    S.codex.entries.push("pressureBurst");
 
-  SaveSystem.persist(S);
-
+  SaveSystem.persist();
   tree();
 };
 
-
 function scan(){
-
   let html=`
     <h2>Scouter Records</h2>
-
     <p>
       Kills: ${S.scouter.kills}<br>
       Deflections: ${S.scouter.deflections}<br>
@@ -3912,261 +2322,241 @@ function scan(){
     </p>
   `;
 
-  for(const [id,r] of Object.entries(
-    S.scouter.techniques
-  )){
+  for(const [id,r] of Object.entries(S.scouter.techniques)){
+    const rate=r.attempts
+      ?Math.round(r.successes/r.attempts*100):0;
 
-    const successRate=
-      r.attempts?
-        Math.round(
-          r.successes/r.attempts*100
-        ):
-        0;
-
-    const avgEnergy=
-      r.attempts?
-        Math.round(
-          r.energySpent/r.attempts
-        ):
-        0;
+    const avg=r.attempts
+      ?Math.round(r.energySpent/r.attempts):0;
 
     html+=`
       <div class="node">
-
-        <b>${TECHNIQUES[id]?.name||id}</b>
-
-        <br>
-
-        Attempts ${r.attempts}
-        · Success ${successRate}%
-
-        <br>
-
-        Avg energy ${avgEnergy}
-
+        <b>${TECHNIQUES[id]?.name||id}</b><br>
+        Attempts ${r.attempts} · Success ${rate}%<br>
+        Avg energy ${avg}
         ${
           r.bestReactionMs!==null
             ?` · Best reaction ${Math.round(r.bestReactionMs)}ms`
             :""
         }
-
         ${
           r.deflections
             ?`<br>Deflections ${r.deflections}`
             :""
         }
-
         ${
           r.traversals
             ?`<br>Traversals ${r.traversals}`
             :""
         }
-
       </div>
     `;
   }
 
-  html+=`
-    <button class="alt"
-            onclick="window.closeModal()">
-      Close
-    </button>
-  `;
-
+  html+=`<button class="alt" onclick="window.closeModal()">Close</button>`;
   openModal(html);
 }
 
-
 function chamber(){
-
   if(!S.dojo.tChamberUnlocked){
-
-    say(
-      "T-CHAMBER LOCKED — complete Valley Gate."
-    );
-
+    say("T-CHAMBER LOCKED — complete Valley Gate.");
     return;
   }
 
   let html=`
     <h2>T-Chamber</h2>
-
     <p>
-      Training evaluates genuine engine results.
-      Ending a session never removes campaign progress.
+      Training uses genuine engine results.
+      Ending training never removes campaign progress.
     </p>
   `;
 
   for(const t of Object.values(TECHNIQUES)){
-
-    if(!S.player.techniques[t.id]){
-      continue;
-    }
-
-    const count=
-      Number(S.drills[t.id]||0);
+    if(!S.player.techniques[t.id])continue;
 
     html+=`
       <div class="node on">
-
-        <b>${t.name}</b>
-
-        <br>
-
-        ${t.role}
-
-        <br>
-
-        Recorded successes:
-        ${count}
-
-        <br>
-
-        <button
-          onclick="window.train('${t.id}')">
-          Practice
-        </button>
-
+        <b>${t.name}</b><br>
+        ${t.role}<br>
+        Recorded successes: ${S.drills[t.id]||0}<br>
+        <button onclick="window.train('${t.id}')">Practice</button>
       </div>
     `;
   }
 
-  html+=`
-    <button class="alt"
-            onclick="window.closeModal()">
-      Close
-    </button>
-  `;
-
+  html+=`<button class="alt" onclick="window.closeModal()">Close</button>`;
   openModal(html);
 }
 
-
-window.train=id=>{
-  TChamberSystem.enter(id);
-};
-
-
-function interactDojo(id){
-
-  if(id==="board")board();
-  if(id==="tree")tree();
-  if(id==="scan")scan();
-  if(id==="chamber")chamber();
-}
-
+window.train=id=>TChamber.enter(id);
 
 /* ============================================================
    RETURN HOME
    ============================================================ */
 
 function returnHome(){
-
   closeModal();
 
-  runtimeState.scene="home";
+  if(runtime.scene==="training")
+    TChamber.active=null;
 
-  runtimeState.entities=[];
-  runtimeState.projectiles=[];
+  runtime.scene="home";
+  runtime.entities=[];
+  runtime.projectiles=[];
+  runtime.player.x=W*.5;
+  runtime.player.y=H*.54;
+  runtime.player.hp=100;
+  runtime.player.energy=100;
 
   S.campaign.currentMissionId=null;
+  S.campaign.scene="home";
+  S.campaign.checkpoint={
+    scene:"home",x:.5,y:.54
+  };
 
-  runtimeState.player.x=W*.5;
-  runtimeState.player.y=H*.54;
+  SaveSystem.persist();
 
-  runtimeState.player.hp=100;
-  runtimeState.player.energy=100;
-
-  TChamberSystem.activeTechnique=null;
-
-  SaveSystem.persist(S);
-
-  say(
-    "HOME DOJO — Select a mission, inspect Storm skills, or train."
-  );
+  say("HOME DOJO — Select a mission, inspect Storm skills, or train.");
 }
 
 window.returnHome=returnHome;
-
-
-/* ============================================================
-   MISSION START
-   ============================================================ */
-
-window.startMission=id=>{
-
-  CampaignSystem.startMission(id);
-};
-
+window.startMission=id=>CampaignSystem.startMission(id);
 
 /* ============================================================
-   PAUSE / RECOVERY
+   DISCOVERY MARKERS
    ============================================================ */
 
-window.resumeGame=()=>{
-  DoraemonSystem.resume();
-};
+function discoveryPosition(){
+  const m=CampaignSystem.currentMission();
+  const phase=CampaignSystem.currentPhase();
 
+  if(!m||!phase)return null;
 
-window.restartCheckpoint=()=>{
+  if(m.id==="forestPursuit")
+    return {x:W*.28,y:H*.5,label:"WIND SHRINE"};
 
-  closeModal();
+  if(m.id==="mountainPass")
+    return {x:W*.48,y:H*.28,label:"ROTATION STONE"};
 
-  DoraemonSystem.paused=false;
+  if(m.id==="ancientRuins")
+    return {x:W*.28,y:H*.5,label:"STORM RELIC"};
 
-  DoraemonSystem.restoreCheckpoint();
+  if(m.id==="stormCore")
+    return {x:W*.5,y:H*.3,label:"STORM CORE"};
 
-  lastFrameTime=performance.now();
-};
+  if(m.id==="tempestCitadel")
+    return {x:W*.5,y:H*.28,label:"STORM ALTAR"};
 
-
-function clearInput(){
-
-  keys={};
-
-  joystick.x=0;
-  joystick.y=0;
-  joystick.active=false;
-
-  knob.style.transform="";
+  return null;
 }
 
+canvas.addEventListener("pointerdown",e=>{
+  if(Doraemon.paused)return;
+
+  /*
+   Home station interaction.
+  */
+  if(runtime.scene==="home"){
+    for(const [id,z] of Object.entries(DojoZones)){
+      if(Math.hypot(e.clientX-z.x,e.clientY-z.y)<z.radius+22){
+        InputRouter.submit({
+          type:"interact",
+          target:id,
+          source:"touch"
+        });
+
+        if(id==="board")board();
+        if(id==="tree")tree();
+        if(id==="scan")scan();
+        if(id==="chamber")chamber();
+        return;
+      }
+    }
+    return;
+  }
+
+  /*
+   Authored discovery interaction.
+  */
+  const m=CampaignSystem.currentMission();
+  const phase=CampaignSystem.currentPhase();
+
+  if(
+    m &&
+    phase?.type==="discovery"
+  ){
+    const pos=discoveryPosition();
+
+    if(
+      pos &&
+      Math.hypot(
+        runtime.player.x-pos.x,
+        runtime.player.y-pos.y
+      )<90
+    ){
+      CampaignSystem.onDiscovery(phase.technique);
+    }
+  }
+});
 
 /* ============================================================
-   INPUT ADAPTERS
+   MENU
+   ============================================================ */
+
+document.getElementById("menu").onclick=()=>{
+  openModal(`
+    <h2>Storm Chronicles V3</h2>
+    <p>
+      T-Engine is the physical authority.<br>
+      Campaign interprets results.<br>
+      Scouter records them.<br>
+      Codex explains them.<br>
+      T-Chamber practices them.<br>
+      Doraemon preserves recovery.
+    </p>
+    <button onclick="window.pauseNow()">Pause</button>
+    <button class="danger" onclick="window.resetV3()">Reset V3 Save</button>
+    <button class="alt" onclick="window.closeModal()">Close</button>
+  `);
+};
+
+window.pauseNow=()=>{
+  Doraemon.pause("Manual pause.");
+};
+
+window.resumeGame=()=>{
+  Doraemon.resume();
+};
+
+window.restartCheckpoint=()=>{
+  Doraemon.restoreCheckpoint();
+};
+
+window.resetV3=()=>{
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+};
+
+/* ============================================================
+   INPUT
    ============================================================ */
 
 let keys={};
+const joystick={x:0,y:0,active:false};
 
-let joystick={
-  x:0,
-  y:0,
-  active:false
-};
+const stick=document.getElementById("stick");
+const knob=document.getElementById("knob");
 
-const stick=$("#stick");
-const knob=$("#knob");
+function updateStick(e){
+  const r=stick.getBoundingClientRect();
 
-
-function updateStick(event){
-
-  const rect=
-    stick.getBoundingClientRect();
-
-  let dx=
-    event.clientX-
-    (rect.left+rect.width/2);
-
-  let dy=
-    event.clientY-
-    (rect.top+rect.height/2);
+  let dx=e.clientX-(r.left+r.width/2);
+  let dy=e.clientY-(r.top+r.height/2);
 
   const max=39;
-
   const len=Math.hypot(dx,dy);
 
   if(len>max){
-
     dx=dx/len*max;
     dy=dy/len*max;
   }
@@ -4174,449 +2564,294 @@ function updateStick(event){
   joystick.x=dx/max;
   joystick.y=dy/max;
 
-  knob.style.transform=
-    `translate(${dx}px,${dy}px)`;
+  knob.style.transform=`translate(${dx}px,${dy}px)`;
 }
 
-
-stick.onpointerdown=e=>{
-
-  e.preventDefault();
-
-  joystick.active=true;
-
-  stick.setPointerCapture(
-    e.pointerId
-  );
-
-  updateStick(e);
-};
-
-
-stick.onpointermove=e=>{
-
-  if(
-    joystick.active
-  ){
-    updateStick(e);
-  }
-};
-
-
 function releaseStick(){
-
   joystick.active=false;
-
   joystick.x=0;
   joystick.y=0;
-
   knob.style.transform="";
 }
 
+stick.onpointerdown=e=>{
+  e.preventDefault();
+  joystick.active=true;
+  stick.setPointerCapture(e.pointerId);
+  updateStick(e);
+};
+
+stick.onpointermove=e=>{
+  if(joystick.active)updateStick(e);
+};
 
 stick.onpointerup=releaseStick;
 stick.onpointercancel=releaseStick;
 
-
-/*
- Touch adapter → Input Router.
- */
-
 function submit(type,extra={}){
-
   InputRouter.submit({
-
     type,
-
     source:"touch",
-
     ...extra
   });
 }
 
-
-$("#atk").onpointerdown=e=>{
+document.getElementById("atk").onpointerdown=e=>{
   e.preventDefault();
-
   submit("attack");
 };
 
-
-$("#dash").onpointerdown=e=>{
+document.getElementById("dash").onpointerdown=e=>{
   e.preventDefault();
-
   submit("dash");
 };
 
-
-$("#tech").onpointerdown=e=>{
-  e.preventDefault();
-
-  const id=currentTechnique();
-
-  if(id){
-    submit(
-      "useTechnique",
-      {
-        techniqueId:id
-      }
-    );
-  }
-};
-
-
-/*
- Keyboard adapter → same Input Router.
- */
-
-addEventListener(
-  "keydown",
-  e=>{
-
-    const key=e.key.toLowerCase();
-
-    keys[key]=true;
-
-    if(
-      key===" " ||
-      key==="enter"
-    ){
-
-      e.preventDefault();
-
-      submit(
-        "attack",
-        {source:"keyboard"}
-      );
-    }
-
-    if(key==="shift"){
-
-      submit(
-        "dash",
-        {source:"keyboard"}
-      );
-    }
-
-    if(
-      ["1","2","3","4","5","6"]
-        .includes(key)
-    ){
-
-      const index=
-        Number(key)-1;
-
-      const ids=
-        Object.keys(TECHNIQUES);
-
-      const id=ids[index];
-
-      if(
-        id &&
-        S.player.techniques[id]
-      ){
-
-        submit(
-          "useTechnique",
-          {
-            source:"keyboard",
-            techniqueId:id
-          }
-        );
-      }
-    }
-
-    if(key==="e"){
-
-      submit(
-        "interact",
-        {source:"keyboard"}
-      );
-    }
-  }
-);
-
-
-addEventListener(
-  "keyup",
-  e=>{
-    keys[e.key.toLowerCase()]=false;
-  }
-);
-
-
-/*
- Visibility / focus interruption.
- */
-
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-
-    if(
-      document.hidden &&
-      !DoraemonSystem.paused
-    ){
-
-      DoraemonSystem.pause(
-        "App interrupted. Simulation paused safely."
-      );
-    }
-  }
-);
-
-
-addEventListener(
-  "blur",
-  ()=>{
-
-    if(
-      !DoraemonSystem.paused
-    ){
-
-      DoraemonSystem.pause(
-        "Focus lost. Simulation paused safely."
-      );
-    }
-  }
-);
-
-
-/* ============================================================
-   MENU
-   ============================================================ */
-
-$("#menu").onclick=()=>{
-
-  openModal(`
-    <h2>Storm Chronicles V3</h2>
-
-    <p>
-      One runtime.
-      One T-Engine simulation authority.
-      Immutable results.
-      Validated recovery.
-    </p>
-
-    <p class="tiny">
-      Input → Request → Validation → T-Engine →
-      Result → Event Bus → Consumers → Snapshot.
-    </p>
-
-    <button onclick="window.pauseNow()">
-      Pause
-    </button>
-
-    <button
-      class="danger"
-      onclick="window.resetV3()">
-      Reset V3 Save
-    </button>
-
-    <button
-      class="alt"
-      onclick="window.closeModal()">
-      Close
-    </button>
-  `);
-};
-
-
-window.pauseNow=()=>{
-
-  DoraemonSystem.pause(
-    "Manual pause."
-  );
-};
-
-
-window.resetV3=()=>{
-
-  localStorage.removeItem(
-    SAVE_KEY
-  );
-
-  location.reload();
-};
-
-
-/* ============================================================
-   HOME INTERACTION
-   ============================================================ */
-
-function homeInteraction(){
-
-  if(
-    runtimeState.scene!=="home"
-  ){
-    return;
-  }
-
-  for(
-    const [id,z] of Object.entries(DojoZones)
-  ){
-
-    if(
-      Math.hypot(
-        runtimeState.player.x-z.x,
-        runtimeState.player.y-z.y
-      )<
-      z.radius+18
-    ){
-
-      say(
-        `${z.label} — press E or tap.`
-      );
-    }
-  }
+function unlockedTechniqueIds(){
+  return Object.keys(TECHNIQUES)
+    .filter(id=>S.player.techniques[id]);
 }
 
+let selectedTechniqueIndex=0;
 
-canvas.onpointerdown=e=>{
+function selectedTechnique(){
+  if(TChamber.active)return TChamber.active;
 
-  if(
-    runtimeState.scene!=="home"
-  ){
-    return;
-  }
+  const ids=unlockedTechniqueIds();
 
-  for(
-    const [id,z] of Object.entries(DojoZones)
-  ){
+  if(!ids.length)return null;
 
-    if(
-      Math.hypot(
-        e.clientX-z.x,
-        e.clientY-z.y
-      )<
-      z.radius+22
-    ){
+  selectedTechniqueIndex=
+    selectedTechniqueIndex%ids.length;
 
-      InputRouter.submit({
-        type:"interact",
-        target:id,
-        source:"touch"
-      });
+  return ids[selectedTechniqueIndex];
+}
 
-      /*
-       Target is interpreted only by the home UI adapter.
-       It does not modify physical state.
-      */
+document.getElementById("tech").onpointerdown=e=>{
+  e.preventDefault();
 
-      interactDojo(id);
+  const id=selectedTechnique();
 
-      return;
-    }
+  if(id){
+    submit("useTechnique",{techniqueId:id});
+  }else{
+    say("No Storm technique is currently learned.");
   }
 };
 
+function cycleTechnique(){
+  const ids=unlockedTechniqueIds();
 
-/* ============================================================
-   DISCOVERY / PHASE INTERACTIONS
-   ============================================================ */
+  if(!ids.length){
+    say("No Storm technique is currently learned.");
+    return;
+  }
 
-canvas.addEventListener(
-  "pointerdown",
-  e=>{
+  selectedTechniqueIndex=
+    (selectedTechniqueIndex+1)%ids.length;
 
-    const mission=
-      CampaignSystem.currentMission();
+  say(
+    `SELECTED — ${TECHNIQUES[ids[selectedTechniqueIndex]].name}`
+  );
+}
 
-    if(!mission)return;
+document.getElementById("tech").ondblclick=e=>{
+  e.preventDefault();
+  cycleTechnique();
+};
 
-    const ms=S.missions[mission.id];
+addEventListener("keydown",e=>{
+  const key=e.key.toLowerCase();
+  keys[key]=true;
 
-    const phase=
-      mission.phases[ms.phase];
+  if(key===" "||key==="enter"){
+    e.preventDefault();
+    submit("attack",{source:"keyboard"});
+  }
 
-    if(
-      !phase?.discovery
-    ){
-      return;
-    }
+  if(key==="shift"){
+    submit("dash",{source:"keyboard"});
+  }
 
-    if(
-      Math.hypot(
-        runtimeState.player.x-e.clientX,
-        runtimeState.player.y-e.clientY
-      )<85
-    ){
+  if(key==="tab"){
+    e.preventDefault();
+    cycleTechnique();
+  }
 
-      DiscoverySystem.discoverTechnique(
-        phase.discovery
-      );
+  if(["1","2","3","4","5","6"].includes(key)){
+    const id=Object.keys(TECHNIQUES)[Number(key)-1];
 
-      ms.phase=phase.next;
+    if(id&&S.player.techniques[id]){
+      selectedTechniqueIndex=
+        unlockedTechniqueIds().indexOf(id);
 
-      ms.progress=0;
-
-      WorldReconstructor.populateCurrentPhase();
-
-      DoraemonSystem.commitCheckpoint();
-
-      updateObjective();
+      submit("useTechnique",{
+        source:"keyboard",
+        techniqueId:id
+      });
     }
   }
-);
 
+  if(key==="e"){
+    if(runtime.scene==="home"){
+      for(const [id,z] of Object.entries(DojoZones)){
+        if(
+          Math.hypot(
+            runtime.player.x-z.x,
+            runtime.player.y-z.y
+          )<z.radius+30
+        ){
+          if(id==="board")board();
+          if(id==="tree")tree();
+          if(id==="scan")scan();
+          if(id==="chamber")chamber();
+        }
+      }
+    }
+  }
+
+  if(key==="escape"){
+    if(UI.modal.classList.contains("show")){
+      closeModal();
+    }else if(!Doraemon.paused){
+      Doraemon.pause("Manual pause.");
+    }
+  }
+});
+
+addEventListener("keyup",e=>{
+  keys[e.key.toLowerCase()]=false;
+});
+
+function clearInput(){
+  keys={};
+  releaseStick();
+}
 
 /* ============================================================
-   OBJECTIVE DISPLAY
+   INTERRUPTION SAFETY
+   ============================================================ */
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&!Doraemon.paused)
+    Doraemon.pause("App interrupted. Simulation paused safely.");
+});
+
+addEventListener("blur",()=>{
+  if(!Doraemon.paused)
+    Doraemon.pause("Focus lost. Simulation paused safely.");
+});
+
+/* ============================================================
+   COMMAND PROCESSING
+   ============================================================ */
+
+function processRequest(req){
+  const validation=Validator.validate(req);
+
+  if(!validation.ok)
+    return EventBus.emit(validation.rejection);
+
+  const authoritative=
+    TEngine.execute(validation.request);
+
+  return EventBus.emit(
+    deepFreeze(authoritative)
+  );
+}
+
+/* ============================================================
+   OBJECTIVE / HUD
    ============================================================ */
 
 function updateObjective(){
-
-  if(
-    runtimeState.scene==="home"
-  ){
-
-    say(
-      "HOME DOJO — Select a mission, inspect Storm skills, or train."
-    );
-
+  if(runtime.scene==="home"){
+    say("HOME DOJO — Select a mission, inspect Storm skills, or train.");
     return;
   }
 
-  if(
-    runtimeState.scene==="training"
-  ){
-
-    const id=
-      TChamberSystem.activeTechnique;
-
-    say(
-      id
-        ?`T-CHAMBER — Use ${TECHNIQUES[id].name}.`
-        :"T-CHAMBER"
-    );
-
+  if(runtime.scene==="training"){
+    if(TChamber.active){
+      const drill=TChamber.drills[TChamber.active]||[];
+      say(
+        `T-CHAMBER — ${drill[TChamber.cueIndex%Math.max(1,drill.length)]||"Practice"}`
+      );
+    }
     return;
   }
 
-  const mission=
-    CampaignSystem.currentMission();
-
-  if(!mission)return;
-
-  const ms=S.missions[mission.id];
-
-  const phase=
-    mission.phases[ms.phase];
+  const phase=CampaignSystem.currentPhase();
 
   if(!phase)return;
 
+  const ms=CampaignSystem.currentState();
+
+  let extra="";
+
+  if(phase.type==="enemyWave")
+    extra=` (${ms.progress}/${phase.enemyCount})`;
+
+  if(phase.type==="projectileTrial")
+    extra=` (${ms.deflections}/${phase.target})`;
+
+  if(phase.type==="hazard")
+    extra=` (${Math.floor(ms.phaseTimer)}/${phase.duration}s)`;
+
   say(
-    `MISSION ${mission.number} — ${phase.objective}`
+    `MISSION ${CampaignSystem.currentMission().number} — ${phase.objective}${extra}`
   );
 }
 
+function updateHUD(){
+  UI.lv.textContent=S.player.level;
+  UI.pw.textContent=S.player.power;
+  UI.xp.textContent=S.player.xp;
+  UI.need.textContent=S.player.level*250;
+  UI.tp.textContent=S.player.tp;
+
+  UI.hp.style.width=`${clamp(runtime.player.hp,0,100)}%`;
+  UI.en.style.width=`${clamp(runtime.player.energy,0,100)}%`;
+
+  UI.hpt.textContent=Math.ceil(runtime.player.hp);
+  UI.ent.textContent=Math.ceil(runtime.player.energy);
+
+  if(runtime.scene==="home"){
+    UI.region.textContent="HOME DOJO";
+    UI.phase.textContent="READY";
+    UI.stat.textContent=`Kills ${S.scouter.kills}`;
+    return;
+  }
+
+  if(runtime.scene==="training"){
+    UI.region.textContent="T-CHAMBER";
+    UI.phase.textContent="TRAINING";
+    UI.stat.textContent=
+      TChamber.active
+        ?`Results ${S.drills[TChamber.active]||0}`
+        :"—";
+    return;
+  }
+
+  const m=CampaignSystem.currentMission();
+  const ms=CampaignSystem.currentState();
+
+  if(!m||!ms)return;
+
+  UI.region.textContent=m.title;
+  UI.phase.textContent=ms.phase.toUpperCase();
+
+  const phase=m.phases[ms.phase];
+
+  UI.stat.textContent=
+    phase?.type==="projectileTrial"
+      ?`Deflect ${ms.deflections}/${phase.target}`
+      :`Progress ${ms.progress}`;
+}
 
 /* ============================================================
-   PHYSICAL INPUT UPDATE
+   MOVE INTENT
    ============================================================ */
 
-function buildMoveRequest(){
-
+function buildMove(){
   let x=joystick.x;
   let y=joystick.y;
 
@@ -4632,448 +2867,230 @@ function buildMoveRequest(){
     y/=len;
   }
 
-  return {
-    x,
-    y
-  };
+  return {x,y};
 }
 
-
 /* ============================================================
-   HUD
+   RENDER
    ============================================================ */
 
-function updateHUD(){
-
-  UI.lv.textContent=S.player.level;
-  UI.pw.textContent=S.player.power;
-  UI.xp.textContent=S.player.xp;
-  UI.need.textContent=S.player.level*250;
-  UI.tp.textContent=S.player.tp;
-
-  UI.hp.style.width=
-    `${Math.max(
-      0,
-      runtimeState.player.hp
-    )}%`;
-
-  UI.en.style.width=
-    `${Math.max(
-      0,
-      runtimeState.player.energy
-    )}%`;
-
-  UI.hpt.textContent=
-    Math.ceil(runtimeState.player.hp);
-
-  UI.ent.textContent=
-    Math.ceil(runtimeState.player.energy);
-
-
-  if(
-    runtimeState.scene==="home"
-  ){
-
-    UI.region.textContent="HOME DOJO";
-    UI.phase.textContent="READY";
-
-    UI.stat.textContent=
-      `Kills ${S.scouter.kills}`;
-
-    return;
-  }
-
-
-  if(
-    runtimeState.scene==="training"
-  ){
-
-    UI.region.textContent="T-CHAMBER";
-    UI.phase.textContent="TRAINING";
-
-    const id=
-      TChamberSystem.activeTechnique;
-
-    UI.stat.textContent=
-      id
-        ?`Results ${S.drills[id]||0}`
-        :"—";
-
-    return;
-  }
-
-
-  const mission=
-    CampaignSystem.currentMission();
-
-  if(!mission)return;
-
-  const ms=S.missions[mission.id];
-
-  UI.region.textContent=
-    mission.title;
-
-  UI.phase.textContent=
-    ms.phase.toUpperCase();
-
-  UI.stat.textContent=
-    `Progress ${ms.progress}`;
-}
-
-
-/* ============================================================
-   RENDERING
-   Rendering cannot determine game truth.
-   ============================================================ */
-
-function circle(
-  x,y,r,fill,stroke=null
-){
-
+function circle(x,y,r,fill,stroke){
   ctx.fillStyle=fill;
-
   ctx.beginPath();
-
-  ctx.arc(
-    x,y,r,0,Math.PI*2
-  );
-
+  ctx.arc(x,y,r,0,Math.PI*2);
   ctx.fill();
 
   if(stroke){
-
     ctx.strokeStyle=stroke;
     ctx.lineWidth=2;
-
     ctx.stroke();
   }
 }
 
-
 function render(){
-
   let palette;
 
-  if(
-    runtimeState.scene==="home"
-  ){
-
+  if(runtime.scene==="home"){
     palette=REGIONS.valley.palette;
-
-  }else if(
-    runtimeState.scene==="training"
-  ){
-
+  }else if(runtime.scene==="training"){
     palette=["#20395c","#091426"];
-
   }else{
-
-    const mission=
-      CampaignSystem.currentMission();
-
-    palette=
-      REGIONS[
-        mission?.regionId||"valley"
-      ].palette;
+    const m=CampaignSystem.currentMission();
+    palette=REGIONS[m?.regionId||"valley"].palette;
   }
 
-
-  const bg=
-    ctx.createLinearGradient(
-      0,0,0,H
-    );
-
-  bg.addColorStop(
-    0,
-    palette[0]
-  );
-
-  bg.addColorStop(
-    1,
-    palette[1]
-  );
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,palette[0]);
+  bg.addColorStop(1,palette[1]);
 
   ctx.fillStyle=bg;
-
-  ctx.fillRect(
-    0,0,W,H
-  );
-
+  ctx.fillRect(0,0,W,H);
 
   ctx.textAlign="center";
 
-
-  if(
-    runtimeState.scene==="home"
-  ){
-
+  if(runtime.scene==="home"){
     ctx.fillStyle="#bdf0ff";
     ctx.font="900 18px system-ui";
+    ctx.fillText("HOME DOJO",W/2,63);
 
-    ctx.fillText(
-      "HOME DOJO",
-      W/2,
-      63
-    );
-
-
-    for(
-      const [id,z] of Object.entries(DojoZones)
-    ){
-
-      const locked=
-        id==="chamber" &&
-        !S.dojo.tChamberUnlocked;
+    for(const [id,z] of Object.entries(DojoZones)){
+      const locked=id==="chamber"&&!S.dojo.tChamberUnlocked;
 
       circle(
-        z.x,
-        z.y,
-        z.radius,
-        locked
-          ?"rgba(63,72,82,.8)"
-          :"rgba(22,126,138,.9)",
+        z.x,z.y,z.radius,
+        locked?"rgba(63,72,82,.8)":"rgba(22,126,138,.9)",
         "#b9f7ff"
       );
 
-      ctx.fillStyle=
-        locked
-          ?" #bdc3ca"
-          :"#efffff";
-
+      ctx.fillStyle=locked?"#bdc3ca":"#efffff";
       ctx.font="bold 9px system-ui";
 
       ctx.fillText(
-        locked
-          ?"T-CHAMBER LOCKED"
-          :z.label,
-        z.x,
-        z.y+3
+        locked?"T-CHAMBER LOCKED":z.label,
+        z.x,z.y+3
       );
     }
 
-  }else{
+    renderPlayer();
+    renderEffects();
+    return;
+  }
 
-    const mission=
-      CampaignSystem.currentMission();
+  ctx.fillStyle="#fff0bd";
+  ctx.font="900 16px system-ui";
 
-    ctx.fillStyle="#fff0bd";
-    ctx.font="900 16px system-ui";
+  ctx.fillText(
+    runtime.scene==="training"
+      ?"T-CHAMBER"
+      :CampaignSystem.currentMission()?.title||"MISSION",
+    W/2,62
+  );
 
-    ctx.fillText(
-      runtimeState.scene==="training"
-        ?"T-CHAMBER"
-        :mission?.title||"MISSION",
-      W/2,
-      62
-    );
+  renderWorldMarkers();
+  renderProjectiles();
+  renderEntities();
+  renderEffects();
+  renderPlayer();
+}
 
+function renderWorldMarkers(){
+  const m=CampaignSystem.currentMission();
+  const phase=CampaignSystem.currentPhase();
 
-    /*
-     Forest bridge visual.
-    */
+  if(!m||!phase)return;
 
-    if(
-      runtimeState.scene==="forestBridge"
-    ){
+  if(
+    m.id==="forestPursuit"&&
+    phase.type==="traversal"
+  ){
+    ctx.fillStyle="#26363c";
+    ctx.fillRect(W*.52,H*.39,W*.20,H*.20);
 
-      ctx.fillStyle="#26363c";
+    ctx.fillStyle="#bdf4ff";
+    ctx.font="bold 10px system-ui";
+    ctx.fillText("JUMP → AIR STEP",W*.62,H*.34);
 
-      ctx.fillRect(
-        W*.40,
-        H*.42,
-        W*.20,
-        H*.18
-      );
+    ctx.fillStyle="#8dffcf";
+    ctx.fillRect(W*.64,H*.39,4,H*.20);
+  }
 
-      ctx.fillStyle="#bdf4ff";
+  if(phase.type==="returnGate"){
+    ctx.fillStyle="#8dffcf";
+    ctx.fillRect(0,H*.38,18,H*.24);
+
+    ctx.fillStyle="#8dffcf";
+    ctx.font="bold 10px system-ui";
+    ctx.fillText("WEST RETURN ←",80,H*.33);
+  }
+
+  if(phase.type==="discovery"){
+    const p=discoveryPosition();
+
+    if(p){
+      circle(p.x,p.y,42,"rgba(90,220,255,.18)","#9df6ff");
+      circle(p.x,p.y,25,"rgba(40,170,200,.45)","#d5ffff");
+
+      ctx.fillStyle="#eaffff";
       ctx.font="bold 10px system-ui";
-
-      ctx.fillText(
-        "JUMP → AIR STEP",
-        W/2,
-        H*.37
-      );
-    }
-
-
-    /*
-     West return route.
-    */
-
-    if(mission){
-
-      const ms=S.missions[mission.id];
-
-      const phase=
-        mission.phases[ms.phase];
-
-      if(
-        phase?.returnGate==="west"
-      ){
-
-        ctx.fillStyle="#8dffcf";
-
-        ctx.fillRect(
-          0,
-          H*.40,
-          17,
-          H*.20
-        );
-
-        ctx.fillStyle="#8dffcf";
-        ctx.font="bold 10px system-ui";
-
-        ctx.fillText(
-          "WEST RETURN ←",
-          75,
-          H*.35
-        );
-      }
-    }
-
-
-    /*
-     Ancient projectile hall marker.
-    */
-
-    if(
-      mission?.id==="ancientRuins" &&
-      S.missions.ancientRuins.phase==="volley"
-    ){
-
-      ctx.fillStyle="#ffd27c";
-      ctx.font="bold 10px system-ui";
-
-      ctx.fillText(
-        "PROJECTILE HALL",
-        W/2,
-        H*.22
-      );
+      ctx.fillText(p.label,p.x,p.y-52);
+      ctx.fillText("APPROACH + TAP",p.x,p.y+58);
     }
   }
 
-
-  /*
-   Projectiles.
-  */
-
-  for(
-    const projectile of runtimeState.projectiles
+  if(
+    m.id==="ancientRuins"&&
+    phase.type==="projectileTrial"
   ){
-
-    circle(
-      projectile.x,
-      projectile.y,
-      projectile.radius,
-      projectile.enemy
-        ?"#ff85bd"
-        :"#5ceaff"
-    );
+    ctx.fillStyle="#ffd27c";
+    ctx.font="bold 10px system-ui";
+    ctx.fillText("PROJECTILE HALL",W/2,H*.20);
   }
 
-
-  /*
-   Enemies.
-  */
-
-  for(
-    const e of runtimeState.entities
+  if(
+    m.id==="stormCore"&&
+    phase.type==="hazard"
   ){
+    ctx.strokeStyle="#ff72c4";
+    ctx.lineWidth=3;
+    ctx.globalAlpha=.4;
+    ctx.beginPath();
+    ctx.arc(W*.5,H*.5,Math.min(W,H)*.35,0,Math.PI*2);
+    ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+}
 
+function renderProjectiles(){
+  for(const p of runtime.projectiles){
     circle(
-      e.x,
-      e.y,
-      e.radius,
-      e.hitTimer>0
-        ?"#fff"
-        :e.color
+      p.x,p.y,p.radius,
+      p.enemy?"#ff85bd":"#5ceaff"
     );
+  }
+}
 
-
-    /*
-     HP.
-    */
+function renderEntities(){
+  for(const e of runtime.entities){
+    circle(
+      e.x,e.y,e.radius,
+      e.hitTimer>0?"#fff":e.color
+    );
 
     ctx.fillStyle="#19172e";
-
     ctx.fillRect(
       e.x-e.radius,
       e.y-e.radius-11,
-      e.radius*2,
-      4
+      e.radius*2,4
     );
 
     ctx.fillStyle="#83f8c7";
-
     ctx.fillRect(
       e.x-e.radius,
       e.y-e.radius-11,
-      e.radius*2*
-        Math.max(
-          0,
-          e.hp/e.maxHp
-        ),
+      e.radius*2*clamp(e.hp/e.maxHp,0,1),
       4
     );
 
-
-    /*
-     Stability.
-    */
-
     if(e.stability<e.maxStability){
-
       ctx.fillStyle="#ffd46a";
-
       ctx.fillRect(
         e.x-e.radius,
         e.y-e.radius-16,
-        e.radius*2*
-          Math.max(
-            0,
-            e.stability/e.maxStability
-          ),
+        e.radius*2*clamp(e.stability/e.maxStability,0,1),
         2
       );
     }
-  }
 
-
-  /*
-   Effects.
-  */
-
-  for(
-    const f of EffectsSystem.particles
-  ){
-
-    ctx.globalAlpha=
-      Math.max(
-        0,
-        f.life*1.8
+    if(e.boss){
+      ctx.fillStyle="#fff";
+      ctx.font="bold 9px system-ui";
+      ctx.fillText(
+        e.displayName||"BOSS",
+        e.x,e.y-e.radius-20
       );
 
-    circle(
-      f.x,
-      f.y,
-      f.radius,
-      f.color
-    );
+      ctx.fillStyle="#ffcf75";
+      ctx.fillText(
+        `PHASE ${e.phase}`,
+        e.x,e.y+e.radius+14
+      );
+    }
+  }
+}
 
+function renderEffects(){
+  for(const f of Effects.particles){
+    ctx.globalAlpha=clamp(f.life*1.8,0,1);
+    circle(f.x,f.y,f.radius,f.color);
     ctx.globalAlpha=1;
   }
+}
 
-
-  /*
-   Player.
-  */
-
-  const p=runtimeState.player;
+function renderPlayer(){
+  const p=runtime.player;
 
   circle(
-    p.x,
-    p.y,
-    p.radius,
+    p.x,p.y,p.radius,
     p.invulnerable>0
       ?"white"
       :p.guardTimer>0
@@ -5082,115 +3099,19 @@ function render(){
     "#e8ffff"
   );
 
-
   ctx.strokeStyle="#efffff";
   ctx.lineWidth=3;
-
   ctx.beginPath();
-
   ctx.moveTo(
     p.x+p.dx*10,
     p.y+p.dy*10
   );
-
   ctx.lineTo(
     p.x+p.dx*25,
     p.y+p.dy*25
   );
-
   ctx.stroke();
 }
-
-
-/* ============================================================
-   EFFECT UPDATE
-   Presentation only.
-   ============================================================ */
-
-function updateEffects(dt){
-
-  for(
-    let i=EffectsSystem.particles.length-1;
-    i>=0;
-    i--
-  ){
-
-    const f=
-      EffectsSystem.particles[i];
-
-    f.x+=f.vx*dt;
-    f.y+=f.vy*dt;
-
-    f.vx*=.90;
-    f.vy*=.90;
-
-    f.life-=dt;
-
-    if(f.life<=0){
-      EffectsSystem.particles.splice(i,1);
-    }
-  }
-}
-
-
-/* ============================================================
-   DEVELOPMENT ARCHITECTURE TEST
-   ============================================================ */
-
-const RuntimeDiagnostics={
-
-  enabled:true,
-
-  removalTest(){
-
-    /*
-     This intentionally tests interfaces rather than
-     deleting global objects during live play.
-
-     Physical truth is held only by TEngine/runtimeState.
-    */
-
-    return {
-
-      effects:
-        "removable — presentation only",
-
-      scouter:
-        "removable — measurement only",
-
-      codex:
-        "removable — knowledge only",
-
-      tChamber:
-        "removable — training only",
-
-      touch:
-        "adapter only",
-
-      keyboard:
-        "adapter only",
-
-      doraemon:
-        "recovery only",
-
-      tEngine:
-        "required — physical authority"
-    };
-  }
-};
-
-window.StormRuntime={
-  processRequest,
-  InputRouter,
-  Validator,
-  TEngine,
-  EventBus,
-  SaveSystem,
-  SnapshotValidator,
-  WorldReconstructor,
-  RuntimeDiagnostics
-};
-
 
 /* ============================================================
    FRAME LOOP
@@ -5198,94 +3119,107 @@ window.StormRuntime={
 
 let lastFrameTime=performance.now();
 
-
 function frame(timestamp){
-
-  let dt=
-    Math.min(
-      .035,
-      (timestamp-lastFrameTime)/1000
-    );
+  const dt=Math.min(
+    .035,
+    Math.max(0,(timestamp-lastFrameTime)/1000)
+  );
 
   lastFrameTime=timestamp;
+  runtime.now=timestamp;
 
-  if(!DoraemonSystem.paused){
+  if(!Doraemon.paused){
 
     /*
-     Movement intent enters through the same request
-     boundary as attack/technique/dash.
+     Movement is submitted as a command just like every
+     other action. It is not directly applied here.
     */
-
-    const move=
-      buildMoveRequest();
-
     if(
-      Math.hypot(move.x,move.y)>0
+      runtime.scene!=="home"&&
+      runtime.scene!=="training"
     ){
+      const move=buildMove();
 
-      InputRouter.submit({
-
-        type:"move",
-
-        direction:move,
-
-        source:
-          joystick.active
-            ?"touch"
-            :"keyboard"
-      });
+      if(Math.hypot(move.x,move.y)>0){
+        InputRouter.submit({
+          type:"move",
+          direction:move,
+          source:joystick.active?"touch":"keyboard"
+        });
+      }
     }
 
+    while(RequestQueue.length){
+      processRequest(RequestQueue.shift());
+    }
 
     /*
-     Every queued command goes through exactly one
-     validation → T-Engine → immutable result path.
+     Continuous physical simulation.
     */
+    TEngine.update(dt);
 
-    while(RequestQueue.length){
+    TChamber.update(dt);
+    Effects.update(dt);
 
-      const request=
-        RequestQueue.shift();
-
-      processRequest(
-        request,
-        dt
+    /*
+     Cooldowns are engine state.
+    */
+    for(const id of Object.keys(runtime.techCooldowns)){
+      runtime.techCooldowns[id]=Math.max(
+        0,
+        runtime.techCooldowns[id]-dt
       );
     }
 
-
-    /*
-     Continuous world simulation remains inside T-Engine.
-    */
-
-    TEngine.tick(dt);
-
-    updateEffects(dt);
-
     updateObjective();
-
     updateHUD();
   }
 
-
   render();
-
   requestAnimationFrame(frame);
 }
 
+/* ============================================================
+   RUNTIME API / DIAGNOSTICS
+   ============================================================ */
+
+window.StormRuntime={
+  InputRouter,
+  Validator,
+  TEngine,
+  EventBus,
+  SaveSystem,
+  SnapshotValidator,
+  WorldReconstructor,
+  CampaignSystem,
+  TechniqueSystem,
+  TChamber,
+  Scouter,
+  Codex,
+
+  diagnostics(){
+    return {
+      tEngine:"physical authority",
+      campaign:"content/progression interpreter",
+      scouter:"measurement only",
+      codex:"knowledge only",
+      tChamber:"training only",
+      doraemon:"recovery only",
+      effects:"presentation only",
+      input:"command adapter only"
+    };
+  }
+};
 
 /* ============================================================
    INITIAL RECONSTRUCTION
    ============================================================ */
 
-WorldReconstructor.build(S);
+WorldReconstructor.build();
 
-if(
-  runtimeState.scene==="home"
-){
-
-  runtimeState.player.x=W*.5;
-  runtimeState.player.y=H*.54;
+if(runtime.scene==="home"){
+  runtime.player.x=W*.5;
+  runtime.player.y=H*.54;
 }
 
 updateObjective();
