@@ -1,0 +1,5299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Storm Chronicles V3 — Six Mission Runtime</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+html,body{
+  margin:0;
+  background:#06152b;
+  color:#effaff;
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  overflow:hidden;
+  touch-action:none;
+}
+canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100dvh;
+}
+#hud{
+  position:fixed;
+  z-index:2;
+  inset:0;
+  pointer-events:none;
+  padding:max(8px,env(safe-area-inset-top))
+          9px
+          max(10px,env(safe-area-inset-bottom));
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:7px;
+}
+.card{
+  padding:7px 9px;
+  border-radius:10px;
+  background:#061b33dc;
+  border:1px solid #82eaff75;
+  box-shadow:0 2px 12px #0008;
+  backdrop-filter:blur(6px);
+}
+.title{
+  font-size:10px;
+  font-weight:900;
+  color:#a8efff;
+  letter-spacing:1px;
+}
+.tiny{
+  font-size:10px;
+  line-height:1.35;
+}
+.bar{
+  width:min(42vw,175px);
+  height:6px;
+  border-radius:99px;
+  background:#142b48;
+  overflow:hidden;
+  margin:2px 0 4px;
+}
+.bar i{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,#ff5f79,#ffb06f);
+}
+.energy i{
+  background:linear-gradient(90deg,#45e8e9,#8e8eff);
+}
+#obj{
+  align-self:center;
+  max-width:94vw;
+  text-align:center;
+}
+.hint{
+  margin-top:auto;
+  align-self:center;
+  max-width:93vw;
+  text-align:center;
+}
+.right{text-align:right}
+.green{color:#8effcd}
+.amber{color:#ffd07a}
+
+#controls{
+  position:fixed;
+  z-index:4;
+  inset:0;
+  pointer-events:none;
+}
+.stick{
+  position:absolute;
+  left:max(14px,env(safe-area-inset-left));
+  bottom:max(14px,calc(env(safe-area-inset-bottom) + 4px));
+  width:126px;
+  height:126px;
+  border-radius:50%;
+  background:#0c315d88;
+  border:1px solid #93edff75;
+  pointer-events:auto;
+}
+.knob{
+  position:absolute;
+  left:38px;
+  top:38px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#52dbe889;
+  border:2px solid #d0faff99;
+}
+.acts{
+  position:absolute;
+  right:max(10px,env(safe-area-inset-right));
+  bottom:max(11px,calc(env(safe-area-inset-bottom) + 4px));
+  width:198px;
+  height:183px;
+  pointer-events:none;
+}
+.btn{
+  position:absolute;
+  border:2px solid #d2f8ff99;
+  border-radius:50%;
+  color:#fff;
+  font-weight:900;
+  font-size:10px;
+  background:#2367a9d9;
+  box-shadow:0 3px 14px #0009;
+  pointer-events:auto;
+}
+.btn:active{transform:scale(.91)}
+#atk{
+  width:70px;
+  height:70px;
+  right:0;
+  bottom:0;
+  background:#3583cddd;
+}
+#dash{
+  width:52px;
+  height:52px;
+  right:75px;
+  bottom:4px;
+}
+#tech{
+  width:56px;
+  height:56px;
+  right:2px;
+  bottom:80px;
+  background:#9363d5dd;
+}
+#menu{
+  position:absolute;
+  top:max(7px,env(safe-area-inset-top));
+  right:max(7px,env(safe-area-inset-right));
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  border:1px solid #a8f2ff;
+  background:#092d55;
+  color:#fff;
+  font-weight:900;
+  pointer-events:auto;
+}
+
+.modal{
+  position:fixed;
+  z-index:20;
+  inset:0;
+  background:#020914df;
+  padding:15px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:auto;
+}
+.modal.show{display:flex}
+.panel{
+  width:min(530px,100%);
+  max-height:86dvh;
+  overflow:auto;
+  border:1px solid #97edff;
+  background:#092643;
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 7px 38px #000;
+}
+.panel h2{
+  margin:0 0 8px;
+  color:#b8f4ff;
+  font-size:18px;
+}
+.panel p{
+  font-size:13px;
+  line-height:1.45;
+}
+.panel button{
+  border:1px solid #a6f0ff;
+  border-radius:9px;
+  padding:9px 11px;
+  color:#fff;
+  font-weight:800;
+  background:#197bbd;
+  margin:4px 3px 0 0;
+}
+.panel button.alt{background:#553c86}
+.panel button.danger{background:#9b3047}
+.node{
+  font-size:12px;
+  padding:8px;
+  border:1px solid #78dcff66;
+  border-radius:8px;
+  margin:6px 0;
+}
+.node.on{
+  border-color:#87ffd0;
+  background:#157a6144;
+}
+.node.lock{
+  border-color:#ffc96c66;
+  color:#d9dce2;
+}
+.desktop{
+  position:fixed;
+  bottom:4px;
+  left:8px;
+  color:#d3e5ed88;
+  font-size:9px;
+  pointer-events:none;
+}
+@media(max-width:390px){
+  .right{display:none}
+  .bar{width:142px}
+  .stick{
+    transform:scale(.88);
+    transform-origin:bottom left;
+  }
+  .acts{
+    transform:scale(.88);
+    transform-origin:bottom right;
+  }
+  .hint{font-size:9px}
+}
+@media(orientation:landscape) and (max-height:560px){
+  .hint{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="hud">
+
+  <div class="row">
+
+    <div class="card">
+      <div class="title">STORM CHRONICLES · V3</div>
+
+      <div class="tiny">
+        LV <b id="lv">1</b>
+        · PWR <b id="pw">10</b>
+        · XP <b id="xp">0</b>/<b id="need">250</b>
+        · TP <b id="tp">0</b>
+      </div>
+
+      <div class="tiny">HP <span id="hpt">100</span></div>
+      <div class="bar">
+        <i id="hp" style="width:100%"></i>
+      </div>
+
+      <div class="tiny">ENERGY <span id="ent">100</span></div>
+      <div class="bar energy">
+        <i id="en" style="width:100%"></i>
+      </div>
+    </div>
+
+    <div class="card tiny right">
+      <b>SCOUTER</b><br>
+      <span id="region">HOME DOJO</span><br>
+      <span id="phase">READY</span><br>
+      <span id="stat">—</span>
+    </div>
+
+  </div>
+
+  <div id="obj" class="card tiny">
+    HOME DOJO — Select a mission or enter a station.
+  </div>
+
+  <div class="card tiny hint">
+    Left pad move · ATK bolt · DASH · TECH Storm technique
+  </div>
+
+</div>
+
+<div id="controls">
+
+  <div id="stick" class="stick">
+    <div id="knob" class="knob"></div>
+  </div>
+
+  <div class="acts">
+    <button id="atk" class="btn">ATK</button>
+    <button id="dash" class="btn">DASH</button>
+    <button id="tech" class="btn">TECH</button>
+  </div>
+
+  <button id="menu">☰</button>
+
+</div>
+
+<div class="desktop">
+  WASD/arrows move · Space attack · Shift dash · 1–6 select technique · E interact
+</div>
+
+<div id="modal" class="modal">
+  <div id="panel" class="panel"></div>
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+/* ============================================================
+   STORM CHRONICLES V3
+   ============================================================
+   ARCHITECTURAL INVARIANT
+
+   INPUT
+      ↓
+   REQUEST
+      ↓
+   VALIDATION
+      ↓
+   T-ENGINE
+      ↓
+   IMMUTABLE RESULT
+      ↓
+   EVENT BUS
+      ↓
+   AUTHORIZED CONSUMERS
+      ↓
+   VALIDATED SNAPSHOT
+      ↓
+   RECONSTRUCTION
+      ↓
+   T-ENGINE
+   ============================================================ */
+
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+
+const SAVE_KEY = "stormChroniclesCampaignV3";
+
+const TECHNIQUES = {
+
+  pressureBurst:{
+    id:"pressureBurst",
+    name:"Pressure Burst",
+    force:"Pressure",
+    cost:25,
+    cooldown:.65,
+    handlerId:"pressureBurst",
+    role:"Create space and break enemy groups.",
+    discovery:"Valley Gate",
+    drill:"pressureCircle"
+  },
+
+  airStep:{
+    id:"airStep",
+    name:"Air Step",
+    force:"Wind",
+    cost:18,
+    cooldown:.35,
+    handlerId:"airStep",
+    role:"Cross broken terrain and reposition in the air.",
+    discovery:"Forest Pursuit",
+    drill:"airStepLane"
+  },
+
+  vortex:{
+    id:"vortex",
+    name:"Vortex",
+    force:"Rotation",
+    cost:30,
+    cooldown:.8,
+    handlerId:"vortex",
+    role:"Pull scattered enemies together.",
+    discovery:"Mountain Pass",
+    drill:"vortexCluster"
+  },
+
+  spiralGuard:{
+    id:"spiralGuard",
+    name:"Spiral Guard",
+    force:"Rotation",
+    cost:16,
+    cooldown:.45,
+    handlerId:"spiralGuard",
+    role:"Deflect projectiles and pressure attackers.",
+    discovery:"Ancient Ruins",
+    drill:"guardVolley"
+  },
+
+  turbulence:{
+    id:"turbulence",
+    name:"Turbulence",
+    force:"Turbulence",
+    cost:23,
+    cooldown:1.0,
+    handlerId:"turbulence",
+    role:"Disrupt unstable enemies and hazards.",
+    discovery:"Storm Core",
+    drill:"turbulenceField"
+  },
+
+  tempest:{
+    id:"tempest",
+    name:"Tempest",
+    force:"Synthesis",
+    cost:42,
+    cooldown:1.4,
+    handlerId:"tempest",
+    role:"Combine Wind, Pressure, Rotation and Turbulence.",
+    discovery:"Tempest Citadel",
+    drill:"tempestChain"
+  }
+
+};
+
+
+/* Generic region definitions */
+
+const REGIONS = {
+
+  valley:{
+    id:"valley",
+    title:"Valley Gate",
+    palette:["#0c405a","#071827"]
+  },
+
+  forest:{
+    id:"forest",
+    title:"Forest Pursuit",
+    palette:["#245b42","#081d1b"]
+  },
+
+  mountain:{
+    id:"mountain",
+    title:"Mountain Pass",
+    palette:["#536274","#151d2c"]
+  },
+
+  ruins:{
+    id:"ruins",
+    title:"Ancient Ruins",
+    palette:["#604936","#211922"]
+  },
+
+  stormCore:{
+    id:"stormCore",
+    title:"Storm Core",
+    palette:["#43386e","#111329"]
+  },
+
+  citadel:{
+    id:"citadel",
+    title:"Tempest Citadel",
+    palette:["#49376b","#101329"]
+  }
+
+};
+
+
+/* Generic enemy definitions */
+
+const ENEMIES = {
+
+  raider:{
+    id:"raider",
+    name:"Raider",
+    hp:38,
+    speed:48,
+    damage:7,
+    stability:45,
+    color:"#bd8cff",
+    ranged:false
+  },
+
+  hunter:{
+    id:"hunter",
+    name:"Forest Hunter",
+    hp:42,
+    speed:60,
+    damage:6,
+    stability:30,
+    color:"#80dbff",
+    ranged:true
+  },
+
+  guardian:{
+    id:"guardian",
+    name:"Mountain Guardian",
+    hp:86,
+    speed:29,
+    damage:13,
+    stability:110,
+    color:"#d6a65d",
+    ranged:false
+  },
+
+  mage:{
+    id:"mage",
+    name:"Ruin Adept",
+    hp:46,
+    speed:36,
+    damage:7,
+    stability:28,
+    color:"#ff7db5",
+    ranged:true
+  },
+
+  entity:{
+    id:"entity",
+    name:"Storm Sentinel",
+    hp:58,
+    speed:49,
+    damage:9,
+    stability:58,
+    color:"#8dffce",
+    ranged:true
+  },
+
+  elite:{
+    id:"elite",
+    name:"Citadel Elite",
+    hp:74,
+    speed:52,
+    damage:11,
+    stability:82,
+    color:"#ff916a",
+    ranged:false
+  }
+
+};
+
+
+/*
+ Mission definitions are content.
+
+ They do not contain movement or combat implementations.
+*/
+
+const MISSIONS = {
+
+  valleyGate:{
+    id:"valleyGate",
+    number:1,
+    title:"Valley Gate",
+    regionId:"valley",
+    problem:"Too many enemies control the route.",
+    rewardXP:250,
+    rewardTP:1,
+    techniqueRewardId:"pressureBurst",
+
+    phases:{
+      forest:{
+        objective:"Reach the Valley Gate.",
+        next:"raiders"
+      },
+
+      raiders:{
+        objective:"Defeat 6 Raiders.",
+        enemyType:"raider",
+        enemyCount:6,
+        next:"captain"
+      },
+
+      captain:{
+        objective:"Defeat the Raider Captain.",
+        bossType:"raider",
+        bossName:"Raider Captain",
+        next:"return"
+      },
+
+      return:{
+        objective:"Cross the west return route.",
+        returnGate:"west",
+        next:"completed"
+      },
+
+      completed:{
+        objective:"Return to the Dojo."
+      }
+    }
+  },
+
+
+  forestPursuit:{
+    id:"forestPursuit",
+    number:2,
+    title:"Forest Pursuit",
+    regionId:"forest",
+    problem:"Broken terrain separates you from the target.",
+    rewardXP:300,
+    rewardTP:1,
+    techniqueRewardId:"airStep",
+
+    phases:{
+      trail:{
+        objective:"Follow the forest trail.",
+        next:"bridge"
+      },
+
+      bridge:{
+        objective:"Reach the broken bridge.",
+        discovery:"airStep",
+        traversalGate:"brokenBridge",
+        next:"pursuit"
+      },
+
+      pursuit:{
+        objective:"Defeat the Forest Hunters.",
+        enemyType:"hunter",
+        enemyCount:4,
+        next:"boss"
+      },
+
+      boss:{
+        objective:"Defeat the Canopy Stalker.",
+        bossType:"hunter",
+        bossName:"Canopy Stalker",
+        next:"return"
+      },
+
+      return:{
+        objective:"Return through the forest exit.",
+        returnGate:"west",
+        next:"completed"
+      },
+
+      completed:{
+        objective:"Return to the Dojo."
+      }
+    }
+  },
+
+
+  mountainPass:{
+    id:"mountainPass",
+    number:3,
+    title:"Mountain Pass",
+    regionId:"mountain",
+    problem:"Enemies control the space around you.",
+    rewardXP:400,
+    rewardTP:1,
+    techniqueRewardId:"vortex",
+
+    phases:{
+      approach:{
+        objective:"Reach the surrounded pass.",
+        next:"surround"
+      },
+
+      surround:{
+        objective:"Survive the surrounding Guardians.",
+        enemyType:"guardian",
+        enemyCount:4,
+        next:"discovery"
+      },
+
+      discovery:{
+        objective:"Activate the Rotation Stone.",
+        discovery:"vortex",
+        next:"trial"
+      },
+
+      trial:{
+        objective:"Break the Guardian formation.",
+        enemyType:"guardian",
+        enemyCount:3,
+        next:"boss"
+      },
+
+      boss:{
+        objective:"Defeat the Mountain Warden.",
+        bossType:"guardian",
+        bossName:"Mountain Warden",
+        next:"return"
+      },
+
+      return:{
+        objective:"Return through the mountain gate.",
+        returnGate:"west",
+        next:"completed"
+      },
+
+      completed:{
+        objective:"Return to the Dojo."
+      }
+    }
+  },
+
+
+  ancientRuins:{
+    id:"ancientRuins",
+    number:4,
+    title:"Ancient Ruins",
+    regionId:"ruins",
+    problem:"Attacks arrive from multiple directions.",
+    rewardXP:500,
+    rewardTP:1,
+    techniqueRewardId:"spiralGuard",
+
+    phases:{
+      entry:{
+        objective:"Enter the ancient ruins.",
+        next:"volley"
+      },
+
+      volley:{
+        objective:"Survive the projectile hall.",
+        projectileTrial:true,
+        next:"discovery"
+      },
+
+      discovery:{
+        objective:"Reach the Relic and awaken Spiral Guard.",
+        discovery:"spiralGuard",
+        next:"guardian"
+      },
+
+      guardian:{
+        objective:"Defeat the Ruin Sentinel.",
+        bossType:"mage",
+        bossName:"Ruin Sentinel",
+        next:"return"
+      },
+
+      return:{
+        objective:"Leave the ruins through the west route.",
+        returnGate:"west",
+        next:"completed"
+      },
+
+      completed:{
+        objective:"Return to the Dojo."
+      }
+    }
+  },
+
+
+  stormCore:{
+    id:"stormCore",
+    number:5,
+    title:"Storm Core",
+    regionId:"stormCore",
+    problem:"The battlefield itself is unstable.",
+    rewardXP:600,
+    rewardTP:1,
+    techniqueRewardId:"turbulence",
+
+    phases:{
+      outer:{
+        objective:"Defeat 5 Storm Sentinels.",
+        enemyType:"entity",
+        enemyCount:5,
+        next:"hazard"
+      },
+
+      hazard:{
+        objective:"Survive the unstable core field.",
+        hazard:true,
+        next:"discovery"
+      },
+
+      discovery:{
+        objective:"Activate the Storm Core and learn Turbulence.",
+        discovery:"turbulence",
+        next:"trial"
+      },
+
+      trial:{
+        objective:"Stabilize the remaining Storm Sentinels.",
+        enemyType:"entity",
+        enemyCount:3,
+        next:"boss"
+      },
+
+      boss:{
+        objective:"Defeat the Core Entity.",
+        bossType:"entity",
+        bossName:"Core Entity",
+        next:"return"
+      },
+
+      return:{
+        objective:"Return through the west core exit.",
+        returnGate:"west",
+        next:"completed"
+      },
+
+      completed:{
+        objective:"Return to the Dojo."
+      }
+    }
+  },
+
+
+  tempestCitadel:{
+    id:"tempestCitadel",
+    number:6,
+    title:"Tempest Citadel",
+    regionId:"citadel",
+    problem:"Every learned force is being used against you.",
+    rewardXP:1000,
+    rewardTP:2,
+    techniqueRewardId:"tempest",
+
+    phases:{
+      approach:{
+        objective:"Enter the Tempest Citadel.",
+        next:"trials"
+      },
+
+      trials:{
+        objective:"Defeat 6 Citadel Guards.",
+        enemyType:"elite",
+        enemyCount:6,
+        next:"discovery"
+      },
+
+      discovery:{
+        objective:"Activate the Storm Altar and learn Tempest.",
+        discovery:"tempest",
+        next:"ascent"
+      },
+
+      ascent:{
+        objective:"Defeat the Citadel Triad.",
+        enemyType:"elite",
+        enemyCount:3,
+        next:"final"
+      },
+
+      final:{
+        objective:"Defeat the Tempest Regent.",
+        bossType:"elite",
+        bossName:"Tempest Regent",
+        next:"ending"
+      },
+
+      ending:{
+        objective:"The Storm has been mastered."
+      }
+    }
+  }
+
+};
+
+
+/* ============================================================
+   SAVE DEFAULTS
+   ============================================================ */
+
+function makeMissionState(status){
+  return {
+    status,
+    phase:status==="available"?"available":"locked",
+    progress:0,
+    bossDefeated:false,
+    discovery:false,
+    rewardApplied:false,
+    checkpoint:null
+  };
+}
+
+const DEFAULT_SAVE = {
+  version:3,
+
+  player:{
+    level:1,
+    xp:0,
+    power:10,
+    tp:0,
+
+    techniques:{
+      pressureBurst:false,
+      airStep:false,
+      vortex:false,
+      spiralGuard:false,
+      turbulence:false,
+      tempest:false
+    }
+  },
+
+  campaign:{
+    currentMissionId:null,
+    scene:"home",
+
+    checkpoint:{
+      scene:"home",
+      x:.5,
+      y:.55
+    }
+  },
+
+  missions:{
+    valleyGate:makeMissionState("available"),
+    forestPursuit:makeMissionState("locked"),
+    mountainPass:makeMissionState("locked"),
+    ancientRuins:makeMissionState("locked"),
+    stormCore:makeMissionState("locked"),
+    tempestCitadel:makeMissionState("locked")
+  },
+
+  dojo:{
+    tChamberUnlocked:false
+  },
+
+  scouter:{
+    techniques:{},
+    kills:0,
+    deflections:0,
+    traversals:0
+  },
+
+  codex:{
+    entries:[]
+  },
+
+  drills:{}
+};
+
+
+function clone(value){
+  return JSON.parse(JSON.stringify(value));
+}
+
+
+function merge(base,extra){
+  for(const key in extra||{}){
+    if(
+      extra[key] &&
+      typeof extra[key]==="object" &&
+      !Array.isArray(extra[key])
+    ){
+      base[key]=merge(base[key]||{},extra[key]);
+    }else{
+      base[key]=extra[key];
+    }
+  }
+  return base;
+}
+
+
+/* ============================================================
+   SAVE VALIDATION
+   ============================================================ */
+
+const SaveSystem = {
+
+  createValidatedSnapshot(state){
+
+    const snapshot = {
+      version:3,
+
+      player:{
+        level:state.player.level,
+        xp:state.player.xp,
+        power:state.player.power,
+        tp:state.player.tp,
+        techniques:clone(state.player.techniques)
+      },
+
+      campaign:{
+        currentMissionId:state.campaign.currentMissionId,
+        scene:state.campaign.scene,
+        checkpoint:clone(state.campaign.checkpoint)
+      },
+
+      missions:clone(state.missions),
+
+      dojo:{
+        tChamberUnlocked:!!state.dojo.tChamberUnlocked
+      },
+
+      scouter:clone(state.scouter),
+      codex:clone(state.codex),
+      drills:clone(state.drills)
+    };
+
+    return SnapshotValidator.validate(snapshot);
+  },
+
+  persist(state){
+    const snapshot=this.createValidatedSnapshot(state);
+    localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot));
+  },
+
+  load(){
+    try{
+      const raw=localStorage.getItem(SAVE_KEY);
+
+      if(!raw){
+        return clone(DEFAULT_SAVE);
+      }
+
+      return SnapshotValidator.validate(
+        merge(clone(DEFAULT_SAVE),JSON.parse(raw))
+      );
+
+    }catch{
+      return clone(DEFAULT_SAVE);
+    }
+  }
+};
+
+
+const SnapshotValidator = {
+
+  validate(snapshot){
+
+    if(!snapshot || snapshot.version!==3){
+      return clone(DEFAULT_SAVE);
+    }
+
+    if(!snapshot.player || !snapshot.campaign){
+      return clone(DEFAULT_SAVE);
+    }
+
+    snapshot.player.level=Math.max(1,Number(snapshot.player.level)||1);
+    snapshot.player.xp=Math.max(0,Number(snapshot.player.xp)||0);
+    snapshot.player.power=Math.max(1,Number(snapshot.player.power)||1);
+    snapshot.player.tp=Math.max(0,Number(snapshot.player.tp)||0);
+
+    if(!snapshot.campaign.checkpoint){
+      snapshot.campaign.checkpoint={
+        scene:"home",
+        x:.5,
+        y:.55
+      };
+    }
+
+    snapshot.campaign.checkpoint.x=Math.min(
+      1,
+      Math.max(0,Number(snapshot.campaign.checkpoint.x)||.5)
+    );
+
+    snapshot.campaign.checkpoint.y=Math.min(
+      1,
+      Math.max(0,Number(snapshot.campaign.checkpoint.y)||.55)
+    );
+
+    for(const m of Object.values(MISSIONS)){
+      const s=snapshot.missions[m.id];
+
+      if(!s){
+        snapshot.missions[m.id]=makeMissionState("locked");
+        continue;
+      }
+
+      s.progress=Math.max(0,Number(s.progress)||0);
+      s.bossDefeated=!!s.bossDefeated;
+      s.discovery=!!s.discovery;
+      s.rewardApplied=!!s.rewardApplied;
+    }
+
+    return snapshot;
+  }
+};
+
+
+/* ============================================================
+   AUTHORITATIVE RUNTIME STATE
+   ============================================================ */
+
+let S=SaveSystem.load();
+
+
+/* ============================================================
+   WORLD RUNTIME
+   ============================================================ */
+
+let canvas=document.getElementById("game");
+let ctx=canvas.getContext("2d");
+
+let W=innerWidth;
+let H=innerHeight;
+let DPR=1;
+
+let runtimeState = {
+  player:{
+    x:W*.5,
+    y:H*.55,
+    radius:15,
+
+    hp:100,
+    maxHp:100,
+
+    energy:100,
+    maxEnergy:100,
+
+    dx:1,
+    dy:0,
+
+    dashTimer:0,
+    invulnerable:0,
+
+    airborne:false,
+    guardTimer:0
+  },
+
+  entities:[],
+  projectiles:[],
+
+  scene:"home",
+
+  now:0,
+
+  worldFlags:{
+    bridgeCrossed:false,
+    westExitOpened:false
+  }
+};
+
+
+/* ============================================================
+   UI
+   ============================================================ */
+
+const $=s=>document.querySelector(s);
+
+const UI={
+  lv:$("#lv"),
+  pw:$("#pw"),
+  xp:$("#xp"),
+  need:$("#need"),
+  tp:$("#tp"),
+  hp:$("#hp"),
+  en:$("#en"),
+  hpt:$("#hpt"),
+  ent:$("#ent"),
+  obj:$("#obj"),
+  region:$("#region"),
+  phase:$("#phase"),
+  stat:$("#stat"),
+  modal:$("#modal"),
+  panel:$("#panel")
+};
+
+
+/* ============================================================
+   EVENT BUS
+   ============================================================ */
+
+const EventBus=(()=>{
+
+  const listeners={};
+
+  return {
+
+    on(type,listener){
+      (listeners[type]??=[]).push(listener);
+    },
+
+    emit(result){
+
+      const frozen=deepFreeze(result);
+
+      for(const listener of listeners[frozen.eventType]||[]){
+        listener(frozen);
+      }
+
+      return frozen;
+    }
+
+  };
+
+})();
+
+
+function deepFreeze(value){
+
+  if(
+    !value ||
+    typeof value!=="object" ||
+    Object.isFrozen(value)
+  ){
+    return value;
+  }
+
+  Object.freeze(value);
+
+  for(const key of Object.keys(value)){
+    deepFreeze(value[key]);
+  }
+
+  return value;
+}
+
+
+/* ============================================================
+   INPUT ROUTER
+   ============================================================ */
+
+const RequestQueue=[];
+
+const InputRouter={
+
+  createRequest(input){
+
+    return {
+      id:
+        globalThis.crypto?.randomUUID?.() ||
+        `${Date.now()}_${Math.random()}`,
+
+      type:input.type,
+
+      actorId:"player",
+
+      techniqueId:input.techniqueId||null,
+
+      direction:input.direction||null,
+
+      source:input.source||"unknown",
+
+      timestamp:performance.now()
+    };
+  },
+
+  submit(input){
+
+    RequestQueue.push(
+      this.createRequest(input)
+    );
+  }
+};
+
+
+/* ============================================================
+   VALIDATOR
+   ============================================================ */
+
+const Validator={
+
+  validate(request,state){
+
+    if(!request || typeof request.type!=="string"){
+      return {
+        ok:false,
+        rejection:{
+          eventType:"requestRejected",
+          requestId:request?.id||null,
+          reason:"invalidRequest"
+        }
+      };
+    }
+
+    if(request.type==="move"){
+      return {
+        ok:true,
+        request
+      };
+    }
+
+    if(request.type==="attack"){
+      return {
+        ok:true,
+        request
+      };
+    }
+
+    if(request.type==="dash"){
+      if(state.player.dashTimer>0){
+        return {
+          ok:false,
+          rejection:{
+            eventType:"requestRejected",
+            requestId:request.id,
+            reason:"dashCooldown"
+          }
+        };
+      }
+
+      return {
+        ok:true,
+        request
+      };
+    }
+
+    if(request.type==="useTechnique"){
+
+      const t=TECHNIQUES[request.techniqueId];
+
+      if(!t){
+        return {
+          ok:false,
+          rejection:{
+            eventType:"requestRejected",
+            requestId:request.id,
+            reason:"unknownTechnique",
+            techniqueId:request.techniqueId
+          }
+        };
+      }
+
+      if(!S.player.techniques[t.id]){
+        return {
+          ok:false,
+          rejection:{
+            eventType:"requestRejected",
+            requestId:request.id,
+            reason:"techniqueLocked",
+            techniqueId:t.id
+          }
+        };
+      }
+
+      if(state.player.energy<t.cost){
+        return {
+          ok:false,
+          rejection:{
+            eventType:"requestRejected",
+            requestId:request.id,
+            reason:"outOfEnergy",
+            techniqueId:t.id
+          }
+        };
+      }
+
+      return {
+        ok:true,
+        request
+      };
+    }
+
+    if(request.type==="interact"){
+      return {
+        ok:true,
+        request
+      };
+    }
+
+    return {
+      ok:false,
+      rejection:{
+        eventType:"requestRejected",
+        requestId:request.id,
+        reason:"unknownRequest"
+      }
+    };
+  }
+
+};
+
+
+/* ============================================================
+   GENERIC WORLD HELPERS
+   These helpers are only called by T-Engine.
+   ============================================================ */
+
+function distance(a,b){
+  return Math.hypot(a.x-b.x,a.y-b.y);
+}
+
+
+function spawnEnemy(type,x,y,options={}){
+
+  const d=ENEMIES[type];
+
+  if(!d)return null;
+
+  const boss=!!options.boss;
+
+  const entity={
+    id:
+      options.id ||
+      `enemy_${Math.random().toString(36).slice(2)}`,
+
+    type,
+
+    x,
+    y,
+
+    radius:boss?25:14,
+
+    hp:boss?d.hp*4:d.hp,
+    maxHp:boss?d.hp*4:d.hp,
+
+    stability:boss?d.stability*2:d.stability,
+    maxStability:boss?d.stability*2:d.stability,
+
+    speed:boss?d.speed*1.1:d.speed,
+    damage:boss?d.damage*1.4:d.damage,
+
+    color:boss?"#ff9e55":d.color,
+
+    ranged:d.ranged,
+
+    boss,
+
+    attackCooldown:.5,
+    hitTimer:0,
+
+    phase:1
+  };
+
+  runtimeState.entities.push(entity);
+
+  return entity;
+}
+
+
+function spawnProjectile(
+  x,y,vx,vy,enemy=false,source="world"
+){
+
+  runtimeState.projectiles.push({
+
+    id:`projectile_${Math.random().toString(36).slice(2)}`,
+
+    x,
+    y,
+
+    vx,
+    vy,
+
+    radius:6,
+
+    lifetime:2,
+
+    enemy,
+
+    source,
+
+    resolved:false
+  });
+}
+
+
+/* ============================================================
+   T-ENGINE
+   ============================================================ */
+
+const TEngine={
+
+  /*
+   This is the physical authority.
+
+   No Campaign / Scouter / Codex / T-Chamber / Effects /
+   Doraemon method mutates physical world state.
+   */
+
+  execute(request,state,dt){
+
+    switch(request.type){
+
+      case "move":
+        return this.resolveMove(request,state,dt);
+
+      case "attack":
+        return this.resolveAttack(request,state);
+
+      case "dash":
+        return this.resolveDash(request,state);
+
+      case "useTechnique":
+        return TechniqueSystem.executeThroughEngine(
+          request,
+          state
+        );
+
+      case "interact":
+        return this.resolveInteraction(request,state);
+
+      default:
+
+        return {
+          eventType:"requestRejected",
+          requestId:request.id,
+          reason:"unsupportedExecution"
+        };
+    }
+  },
+
+
+  resolveMove(request,state,dt){
+
+    const input=request.direction||{x:0,y:0};
+
+    let x=Number(input.x)||0;
+    let y=Number(input.y)||0;
+
+    const len=Math.hypot(x,y);
+
+    if(len>1){
+      x/=len;
+      y/=len;
+    }
+
+    if(len>0){
+      state.player.dx=x;
+      state.player.dy=y;
+    }
+
+    const speed=state.player.dashTimer>0?680:185;
+
+    const old={
+      x:state.player.x,
+      y:state.player.y
+    };
+
+    state.player.x+=x*speed*dt;
+    state.player.y+=y*speed*dt;
+
+    state.player.x=Math.max(
+      15,
+      Math.min(W-15,state.player.x)
+    );
+
+    state.player.y=Math.max(
+      15,
+      Math.min(H-15,state.player.y)
+    );
+
+    state.player.airborne =
+      state.scene==="forestBridge" &&
+      state.player.y<H*.43;
+
+    return {
+      eventType:"movementResolved",
+
+      requestId:request.id,
+
+      actorId:"player",
+
+      applied:true,
+
+      movementResult:{
+        startPosition:old,
+        endPosition:{
+          x:state.player.x,
+          y:state.player.y
+        },
+
+        distanceMoved:Math.hypot(
+          state.player.x-old.x,
+          state.player.y-old.y
+        )
+      }
+    };
+  },
+
+
+  resolveDash(request,state){
+
+    const p=state.player;
+
+    if(p.dashTimer>0){
+      return {
+        eventType:"dashResolved",
+        requestId:request.id,
+        activated:false,
+        success:false,
+        energySpent:0
+      };
+    }
+
+    if(p.energy<10){
+      return {
+        eventType:"dashResolved",
+        requestId:request.id,
+        activated:false,
+        success:false,
+        energySpent:0,
+        failureReason:"outOfEnergy"
+      };
+    }
+
+    p.energy-=10;
+    p.dashTimer=.20;
+    p.invulnerable=.20;
+
+    const start={x:p.x,y:p.y};
+
+    p.x+=p.dx*95;
+    p.y+=p.dy*95;
+
+    p.x=Math.max(15,Math.min(W-15,p.x));
+    p.y=Math.max(15,Math.min(H-15,p.y));
+
+    return {
+      eventType:"dashResolved",
+
+      requestId:request.id,
+
+      activated:true,
+      success:true,
+
+      energySpent:10,
+
+      movementResult:{
+        startPosition:start,
+        endPosition:{
+          x:p.x,
+          y:p.y
+        },
+        distanceMoved:95
+      }
+    };
+  },
+
+
+  resolveAttack(request,state){
+
+    const p=state.player;
+
+    let target=null;
+    let best=Infinity;
+
+    for(const e of state.entities){
+
+      const d=distance(p,e);
+
+      if(d<best){
+        best=d;
+        target=e;
+      }
+    }
+
+    const result={
+      eventType:"attackResolved",
+
+      requestId:request.id,
+
+      actorId:"player",
+
+      activated:true,
+      success:false,
+
+      damage:0,
+
+      targetsAffected:[],
+
+      projectileCreated:false
+    };
+
+    if(
+      target &&
+      best<175
+    ){
+
+      const dx=target.x-p.x;
+      const dy=target.y-p.y;
+      const len=Math.hypot(dx,dy)||1;
+
+      p.dx=dx/len;
+      p.dy=dy/len;
+
+      this.applyDamage(
+        target,
+        16,
+        18,
+        p.dx*25,
+        p.dy*25,
+        result
+      );
+
+      result.success=true;
+
+    }else{
+
+      spawnProjectile(
+        p.x+p.dx*20,
+        p.y+p.dy*20,
+        p.dx*430,
+        p.dy*430,
+        false,
+        "basicAttack"
+      );
+
+      result.projectileCreated=true;
+    }
+
+    return result;
+  },
+
+
+  applyDamage(
+    target,
+    damage,
+    stabilityDamage,
+    knockbackX,
+    knockbackY,
+    result
+  ){
+
+    if(!target)return;
+
+    target.hp-=damage;
+
+    target.stability-=stabilityDamage;
+
+    target.x+=knockbackX;
+    target.y+=knockbackY;
+
+    target.hitTimer=.14;
+
+    result.targetsAffected.push({
+      id:target.id,
+      damage,
+      stabilityDamage
+    });
+
+    let stabilityBroken=false;
+
+    if(target.stability<=0){
+
+      stabilityBroken=true;
+
+      target.stability=target.maxStability;
+
+      target.hitTimer=.7;
+    }
+
+    if(target.hp<=0){
+
+      const index=runtimeState.entities.indexOf(target);
+
+      if(index>=0){
+        runtimeState.entities.splice(index,1);
+      }
+
+      EventBus.emit({
+        eventType:"enemyDefeated",
+
+        eventId:
+          `enemyDefeated_${Math.random()}`,
+
+        enemyId:target.id,
+        enemyType:target.type,
+
+        boss:target.boss,
+
+        defeatedBy:{
+          actorId:"player",
+          source:result.techniqueId||"attack"
+        },
+
+        combatResult:{
+          damageTaken:damage,
+          stabilityBroken
+        },
+
+        missionId:S.campaign.currentMissionId
+      });
+
+    }
+
+  },
+
+
+  resolveProjectileCollision(projectile){
+
+    const p=runtimeState.player;
+
+    if(!projectile.enemy)return false;
+
+    if(
+      distance(projectile,p) >
+      p.radius+projectile.radius+5
+    ){
+      return false;
+    }
+
+    if(p.invulnerable>0){
+      return true;
+    }
+
+    if(p.guardTimer>0){
+
+      EventBus.emit({
+
+        eventType:"projectileDeflected",
+
+        eventId:`deflect_${Math.random()}`,
+
+        projectileId:projectile.id,
+
+        actorId:"player",
+
+        source:projectile.source,
+
+        success:true
+      });
+
+      projectile.vx=-projectile.vx*1.15;
+      projectile.vy=-projectile.vy*1.15;
+      projectile.enemy=false;
+      projectile.source="deflected";
+
+      return true;
+    }
+
+    p.hp-=7;
+
+    EventBus.emit({
+
+      eventType:"playerDamaged",
+
+      eventId:`damage_${Math.random()}`,
+
+      damage:7,
+
+      source:projectile.source,
+
+      hpRemaining:Math.max(0,p.hp)
+    });
+
+    projectile.resolved=true;
+
+    return true;
+  },
+
+
+  resolveEnemyCollision(entity){
+
+    const p=runtimeState.player;
+
+    const d=distance(entity,p);
+
+    if(
+      d >
+      entity.radius+p.radius+5
+    ){
+      return;
+    }
+
+    if(entity.attackCooldown>0){
+      return;
+    }
+
+    entity.attackCooldown=.82;
+
+    if(p.guardTimer>0){
+
+      entity.stability-=36;
+
+      EventBus.emit({
+
+        eventType:"guardContactResolved",
+
+        eventId:`guard_${Math.random()}`,
+
+        enemyId:entity.id,
+
+        stabilityDamage:36
+      });
+
+      if(entity.stability<=0){
+
+        entity.stability=entity.maxStability;
+
+        EventBus.emit({
+
+          eventType:"enemyStabilityBroken",
+
+          enemyId:entity.id,
+
+          source:"guard"
+        });
+      }
+
+      return;
+    }
+
+    if(p.invulnerable<=0){
+
+      p.hp-=entity.damage;
+
+      EventBus.emit({
+
+        eventType:"playerDamaged",
+
+        eventId:`damage_${Math.random()}`,
+
+        damage:entity.damage,
+
+        source:"enemyContact",
+
+        enemyId:entity.id,
+
+        hpRemaining:Math.max(0,p.hp)
+      });
+    }
+  },
+
+
+  /*
+   Generic technique interaction.
+   Mission content is inspected only as data.
+  */
+
+  resolveTraversal(){
+
+    const mission=CampaignSystem.currentMission();
+
+    if(!mission)return null;
+
+    const state=S.missions[mission.id];
+
+    const phase=mission.phases[state.phase];
+
+    if(
+      phase?.traversalGate==="brokenBridge" &&
+      runtimeState.scene==="forestBridge" &&
+      runtimeState.player.x>W*.68 &&
+      runtimeState.player.y<H*.46
+    ){
+
+      return "brokenBridge";
+    }
+
+    return null;
+  },
+
+
+  resolveInteraction(request){
+
+    const result={
+      eventType:"interactionResolved",
+
+      requestId:request.id,
+
+      success:false,
+
+      target:null
+    };
+
+    if(runtimeState.scene!=="home"){
+      return result;
+    }
+
+    for(const [id,z] of Object.entries(DojoZones)){
+
+      if(
+        Math.hypot(
+          runtimeState.player.x-z.x,
+          runtimeState.player.y-z.y
+        )<
+        z.radius+20
+      ){
+
+        result.success=true;
+        result.target=id;
+
+        return result;
+      }
+    }
+
+    return result;
+  },
+
+
+  /*
+   All continuous physical simulation occurs here.
+
+   No consumer runs enemy movement, projectile movement,
+   player damage, collision, boss logic, or physical triggers.
+  */
+
+  tick(dt){
+
+    const state=runtimeState;
+    const p=state.player;
+
+    if(state.scene==="home" || state.scene==="training"){
+      p.energy=Math.min(
+        p.maxEnergy,
+        p.energy+10*dt
+      );
+
+      p.dashTimer=Math.max(0,p.dashTimer-dt);
+      p.invulnerable=Math.max(0,p.invulnerable-dt);
+      p.guardTimer=Math.max(0,p.guardTimer-dt);
+
+      return;
+    }
+
+    p.energy=Math.min(
+      p.maxEnergy,
+      p.energy+8*dt
+    );
+
+    p.dashTimer=Math.max(0,p.dashTimer-dt);
+    p.invulnerable=Math.max(0,p.invulnerable-dt);
+    p.guardTimer=Math.max(0,p.guardTimer-dt);
+
+    /*
+     Enemy simulation authority.
+    */
+
+    for(const e of [...state.entities]){
+
+      e.attackCooldown-=dt;
+      e.hitTimer-=dt;
+
+      const dx=p.x-e.x;
+      const dy=p.y-e.y;
+      const d=Math.hypot(dx,dy)||1;
+
+      if(e.ranged){
+
+        if(d>120){
+
+          e.x+=dx/d*e.speed*dt;
+          e.y+=dy/d*e.speed*dt;
+        }
+
+        if(
+          e.attackCooldown<=0 &&
+          d<330
+        ){
+
+          e.attackCooldown=1.25;
+
+          spawnProjectile(
+            e.x,
+            e.y,
+            dx/d*190,
+            dy/d*190,
+            true,
+            e.type
+          );
+        }
+
+      }else{
+
+        if(d>e.radius+p.radius+10){
+
+          e.x+=dx/d*e.speed*dt;
+          e.y+=dy/d*e.speed*dt;
+        }
+      }
+
+      /*
+       Stability naturally recovers.
+      */
+
+      e.stability=Math.min(
+        e.maxStability,
+        e.stability+9*dt
+      );
+
+      this.resolveEnemyCollision(e);
+    }
+
+
+    /*
+     Projectile simulation authority.
+    */
+
+    for(let i=state.projectiles.length-1;i>=0;i--){
+
+      const projectile=state.projectiles[i];
+
+      projectile.x+=projectile.vx*dt;
+      projectile.y+=projectile.vy*dt;
+
+      projectile.lifetime-=dt;
+
+      if(projectile.resolved || projectile.lifetime<=0){
+
+        state.projectiles.splice(i,1);
+
+        continue;
+      }
+
+
+      /*
+       Deflected/player projectiles can hit enemies.
+      */
+
+      if(!projectile.enemy){
+
+        let hitTarget=null;
+
+        for(const e of [...state.entities]){
+
+          if(
+            distance(projectile,e)<
+            projectile.radius+e.radius
+          ){
+
+            hitTarget=e;
+            break;
+          }
+        }
+
+        if(hitTarget){
+
+          const r={
+            eventType:"projectileHitResolved",
+
+            projectileId:projectile.id,
+
+            techniqueId:
+              projectile.source==="deflected"
+                ?"spiralGuard"
+                :null,
+
+            targetsAffected:[]
+          };
+
+          this.applyDamage(
+            hitTarget,
+            projectile.source==="deflected"?24:16,
+            projectile.source==="deflected"?28:18,
+            projectile.vx*.035,
+            projectile.vy*.035,
+            r
+          );
+
+          EventBus.emit(r);
+
+          state.projectiles.splice(i,1);
+
+          continue;
+        }
+      }
+
+
+      if(projectile.enemy){
+
+        if(
+          this.resolveProjectileCollision(projectile)
+        ){
+
+          if(
+            projectile.resolved ||
+            projectile.enemy
+          ){
+            state.projectiles.splice(i,1);
+          }
+
+          continue;
+        }
+      }
+
+
+      if(
+        projectile.x<-40 ||
+        projectile.x>W+40 ||
+        projectile.y<-40 ||
+        projectile.y>H+40
+      ){
+        state.projectiles.splice(i,1);
+      }
+    }
+
+
+    /*
+     Generic traversal gate.
+     Physical crossing becomes true here.
+    */
+
+    const traversal=this.resolveTraversal();
+
+    if(traversal){
+
+      EventBus.emit({
+
+        eventType:"traversalResolved",
+
+        eventId:`traversal_${Math.random()}`,
+
+        gateId:traversal,
+
+        actorId:"player",
+
+        success:true,
+
+        position:{
+          x:p.x,
+          y:p.y
+        }
+      });
+    }
+
+
+    /*
+     Generic return gate.
+    */
+
+    const mission=CampaignSystem.currentMission();
+
+    if(mission){
+
+      const ms=S.missions[mission.id];
+      const phase=mission.phases[ms.phase];
+
+      if(
+        phase?.returnGate==="west" &&
+        p.x<W*.08
+      ){
+
+        EventBus.emit({
+
+          eventType:"returnGateCrossed",
+
+          eventId:`return_${Math.random()}`,
+
+          missionId:mission.id,
+
+          gateId:"west",
+
+          success:true
+        });
+      }
+    }
+
+
+    /*
+     Generic death truth.
+    */
+
+    if(p.hp<=0){
+
+      EventBus.emit({
+
+        eventType:"playerDefeated",
+
+        eventId:`death_${Math.random()}`,
+
+        checkpointAvailable:true
+      });
+
+      p.hp=p.maxHp;
+      p.energy=p.maxEnergy;
+    }
+  }
+
+};
+
+
+/* ============================================================
+   TECHNIQUE SYSTEM
+   ============================================================ */
+
+const TechniqueSystem={
+
+  executeThroughEngine(request,state){
+
+    const technique=TECHNIQUES[request.techniqueId];
+
+    const startTime=performance.now();
+
+    const result={
+      eventType:"techniqueResolved",
+
+      eventId:`technique_${Math.random()}`,
+
+      requestId:request.id,
+
+      techniqueId:technique.id,
+
+      actorId:"player",
+
+      requestedAt:request.timestamp,
+
+      resolvedAt:startTime,
+
+      activated:false,
+
+      success:false,
+
+      failureReason:null,
+
+      energySpent:0,
+
+      cooldownStarted:false,
+
+      timing:{
+        reactionMs:Math.max(
+          0,
+          startTime-request.timestamp
+        ),
+        grade:"good"
+      },
+
+      movementResult:null,
+
+      collisionResult:null,
+
+      targetsAffected:[],
+
+      interaction:null,
+
+      environmentalEffect:null
+    };
+
+
+    if(
+      state.player.energy<
+      technique.cost
+    ){
+
+      result.failureReason="outOfEnergy";
+
+      return result;
+    }
+
+
+    state.player.energy-=technique.cost;
+
+    result.energySpent=technique.cost;
+
+    result.activated=true;
+
+    const handler=
+      TECHNIQUE_HANDLERS[
+        technique.handlerId
+      ];
+
+    if(!handler){
+
+      result.activated=false;
+      result.failureReason="missingHandler";
+
+      return result;
+    }
+
+    handler(
+      technique,
+      result,
+      state
+    );
+
+    return result;
+  }
+
+};
+
+
+/* ============================================================
+   GENERIC TECHNIQUE HANDLERS
+   ============================================================ */
+
+const TECHNIQUE_HANDLERS={
+
+  pressureBurst(technique,result,state){
+
+    const p=state.player;
+
+    for(const e of [...state.entities]){
+
+      const dx=e.x-p.x;
+      const dy=e.y-p.y;
+      const d=Math.hypot(dx,dy)||1;
+
+      if(d<175){
+
+        TEngine.applyDamage(
+          e,
+          28,
+          35,
+          dx/d*105,
+          dy/d*105,
+          result
+        );
+      }
+    }
+
+    result.success=result.targetsAffected.length>0;
+
+    result.interaction={
+      category:"crowdControl",
+      tags:["pressure","spaceCreation"]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#c38cff",
+      35
+    );
+  },
+
+
+  airStep(technique,result,state){
+
+    const p=state.player;
+
+    if(!p.airborne){
+
+      result.failureReason="requiresAirborne";
+
+      /*
+       Energy spent is reversed because activation did not occur.
+      */
+
+      p.energy+=result.energySpent;
+      result.energySpent=0;
+      result.activated=false;
+
+      return;
+    }
+
+    const start={
+      x:p.x,
+      y:p.y
+    };
+
+    p.x+=p.dx*135;
+    p.y+=p.dy*135;
+
+    p.x=Math.max(15,Math.min(W-15,p.x));
+    p.y=Math.max(15,Math.min(H-15,p.y));
+
+    const gate=TEngine.resolveTraversal();
+
+    p.airborne=false;
+
+    result.success=true;
+
+    result.movementResult={
+      applied:true,
+
+      startPosition:start,
+
+      endPosition:{
+        x:p.x,
+        y:p.y
+      },
+
+      distanceMoved:135,
+
+      wasAirborne:true,
+
+      landed:true
+    };
+
+    result.collisionResult={
+      crossedTraversalGate:
+        gate==="brokenBridge",
+
+      traversalGate:
+        gate==="brokenBridge"
+          ?"brokenBridge"
+          :null
+    };
+
+    result.interaction={
+      category:"traversal",
+      tags:["airborne","aerialMobility"]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#6ceeff",
+      22
+    );
+  },
+
+
+  vortex(technique,result,state){
+
+    const p=state.player;
+
+    for(const e of [...state.entities]){
+
+      const dx=p.x-e.x;
+      const dy=p.y-e.y;
+
+      const d=Math.hypot(dx,dy)||1;
+
+      if(d<235){
+
+        TEngine.applyDamage(
+          e,
+          20,
+          50,
+          dx/d*82,
+          dy/d*82,
+          result
+        );
+      }
+    }
+
+    result.success=result.targetsAffected.length>0;
+
+    result.interaction={
+      category:"groupControl",
+      tags:["rotation","pull","formationBreak"]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#ffd46a",
+      42
+    );
+  },
+
+
+  spiralGuard(technique,result,state){
+
+    const p=state.player;
+
+    p.guardTimer=.72;
+
+    result.success=true;
+
+    result.interaction={
+      category:"activeDefense",
+      tags:["deflection","guard","projectileControl"]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#8fffe2",
+      18
+    );
+  },
+
+
+  turbulence(technique,result,state){
+
+    const p=state.player;
+
+    for(const e of state.entities){
+
+      const d=distance(p,e);
+
+      if(d<215){
+
+        e.speed*=.45;
+
+        e.attackCooldown=Math.max(
+          e.attackCooldown,
+          1.0
+        );
+
+        result.targetsAffected.push({
+          id:e.id,
+          disrupted:true
+        });
+      }
+    }
+
+    result.success=result.targetsAffected.length>0;
+
+    result.interaction={
+      category:"disruption",
+      tags:["turbulence","instability","accuracyBreak"]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#ff77b9",
+      38
+    );
+  },
+
+
+  tempest(technique,result,state){
+
+    const p=state.player;
+
+    for(const e of [...state.entities]){
+
+      const dx=e.x-p.x;
+      const dy=e.y-p.y;
+
+      const d=Math.hypot(dx,dy)||1;
+
+      if(d<270){
+
+        TEngine.applyDamage(
+          e,
+          46,
+          85,
+          dx/d*145,
+          dy/d*145,
+          result
+        );
+      }
+    }
+
+    result.success=result.targetsAffected.length>0;
+
+    result.interaction={
+      category:"synthesis",
+      tags:[
+        "wind",
+        "pressure",
+        "rotation",
+        "turbulence"
+      ]
+    };
+
+    EffectsSystem.emitBurst(
+      p.x,
+      p.y,
+      "#f6e17a",
+      65
+    );
+  }
+
+};
+
+
+/* ============================================================
+   CENTRAL PROCESSING BOUNDARY
+   ============================================================ */
+
+function processRequest(request,dt){
+
+  /*
+   This is the only command → authoritative outcome route.
+  */
+
+  const validation=
+    Validator.validate(
+      request,
+      runtimeState
+    );
+
+  if(!validation.ok){
+
+    return EventBus.emit(
+      deepFreeze(
+        validation.rejection
+      )
+    );
+  }
+
+  const result=
+    deepFreeze(
+      TEngine.execute(
+        validation.request,
+        runtimeState,
+        dt
+      )
+    );
+
+  return EventBus.emit(result);
+}
+
+
+/* ============================================================
+   CAMPAIGN SYSTEM
+   ============================================================ */
+
+const CampaignSystem={
+
+  currentMission(){
+
+    const id=S.campaign.currentMissionId;
+
+    return id?
+      MISSIONS[id]:
+      null;
+  },
+
+
+  startMission(id){
+
+    const mission=MISSIONS[id];
+
+    if(!mission)return;
+
+    const ms=S.missions[id];
+
+    if(
+      ms.status!=="available" &&
+      ms.status!=="active"
+    ){
+      return;
+    }
+
+    S.campaign.currentMissionId=id;
+
+    ms.status="active";
+
+    /*
+     Mission starts are content interpretation.
+     Physical placement is reconstructed by T-Engine.
+    */
+
+    ms.phase=
+      ms.phase==="available"
+        ? Object.keys(mission.phases)[0]
+        : ms.phase;
+
+    ms.progress=0;
+
+    ms.bossDefeated=false;
+
+    runtimeState.scene=
+      id==="forestPursuit" &&
+      ms.phase==="bridge"
+        ?"forestBridge"
+        :"mission";
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    runtimeState.player.x=45;
+    runtimeState.player.y=H*.53;
+
+    runtimeState.worldFlags={
+      bridgeCrossed:false,
+      westExitOpened:false
+    };
+
+    WorldReconstructor.populateCurrentPhase();
+
+    DoraemonSystem.commitCheckpoint();
+
+    closeModal();
+
+    updateObjective();
+  },
+
+
+  onEnemyDefeated(result){
+
+    const mission=this.currentMission();
+
+    if(!mission)return;
+
+    const ms=S.missions[mission.id];
+
+    if(
+      result.missionId!==mission.id
+    ){
+      return;
+    }
+
+
+    if(result.boss){
+
+      ms.bossDefeated=true;
+
+      this.advancePhaseFromEngine(
+        "bossDefeated"
+      );
+
+      DoraemonSystem.commitCheckpoint();
+
+      return;
+    }
+
+
+    ms.progress++;
+
+    const phase=mission.phases[ms.phase];
+
+    if(
+      phase?.enemyCount &&
+      ms.progress>=phase.enemyCount &&
+      runtimeState.entities.length===0
+    ){
+
+      this.advancePhaseFromEngine(
+        "enemyObjectiveComplete"
+      );
+
+      DoraemonSystem.commitCheckpoint();
+    }
+  },
+
+
+  onTraversalResolved(result){
+
+    const mission=this.currentMission();
+
+    if(!mission)return;
+
+    const ms=S.missions[mission.id];
+
+    const phase=mission.phases[ms.phase];
+
+    if(
+      result.gateId==="brokenBridge" &&
+      phase?.traversalGate==="brokenBridge"
+    ){
+
+      ms.phase=phase.next;
+
+      runtimeState.scene="mission";
+
+      runtimeState.worldFlags.bridgeCrossed=true;
+
+      runtimeState.player.x=Math.min(
+        W*.78,
+        runtimeState.player.x+50
+      );
+
+      WorldReconstructor.populateCurrentPhase();
+
+      DoraemonSystem.commitCheckpoint();
+
+      say(
+        "Bridge crossed — pursue the Canopy Stalker."
+      );
+    }
+  },
+
+
+  onReturnGateCrossed(result){
+
+    const mission=this.currentMission();
+
+    if(!mission)return;
+
+    const ms=S.missions[mission.id];
+
+    const phase=mission.phases[ms.phase];
+
+    if(
+      phase?.returnGate==="west" &&
+      result.gateId==="west"
+    ){
+
+      this.completeMission(mission.id);
+    }
+  },
+
+
+  onInteractionResolved(result){
+
+    if(!result.success)return;
+
+    if(
+      S.campaign.currentMissionId
+    ){
+      return;
+    }
+
+    if(result.target==="board"){
+      board();
+    }
+
+    if(result.target==="tree"){
+      tree();
+    }
+
+    if(result.target==="scan"){
+      scan();
+    }
+
+    if(result.target==="chamber"){
+      chamber();
+    }
+  },
+
+
+  onPlayerDefeated(){
+
+    DoraemonSystem.restoreCheckpoint();
+  },
+
+
+  advancePhaseFromEngine(reason){
+
+    const mission=this.currentMission();
+
+    if(!mission)return;
+
+    const ms=S.missions[mission.id];
+
+    const phase=mission.phases[ms.phase];
+
+    if(!phase?.next)return;
+
+    ms.phase=phase.next;
+
+    ms.progress=0;
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    WorldReconstructor.populateCurrentPhase();
+
+    updateObjective();
+  },
+
+
+  completeMission(id){
+
+    const mission=MISSIONS[id];
+
+    if(!mission)return;
+
+    const ms=S.missions[id];
+
+    if(ms.rewardApplied){
+      return;
+    }
+
+    ms.rewardApplied=true;
+    ms.status="completed";
+    ms.phase="completed";
+
+    S.player.xp+=mission.rewardXP;
+    S.player.tp+=mission.rewardTP;
+
+    /*
+     Mission 1 makes Pressure Burst available through
+     the technique tree; the player purchases it with TP.
+     Later discoveries are unlocked at their authored
+     discovery points.
+    */
+
+    if(
+      mission.id!=="valleyGate"
+    ){
+
+      S.player.techniques[
+        mission.techniqueRewardId
+      ]=true;
+    }
+
+    if(mission.id==="valleyGate"){
+      S.dojo.tChamberUnlocked=true;
+    }
+
+    const nextMission=
+      Object.values(MISSIONS)
+        .find(m=>m.number===mission.number+1);
+
+    if(nextMission){
+      S.missions[nextMission.id].status="available";
+      S.missions[nextMission.id].phase="available";
+    }
+
+    SaveSystem.persist(S);
+
+    open(`
+      <h2>MISSION ${mission.number} COMPLETE</h2>
+      <p><b>${mission.title}</b></p>
+
+      <p class="green">
+        +${mission.rewardXP} XP<br>
+        +${mission.rewardTP} TP
+        ${mission.id==="valleyGate"
+          ?"<br>Pressure Burst is now available in the Technique Tree."
+          :`<br>${TECHNIQUES[mission.techniqueRewardId].name} mastered.`}
+        ${nextMission
+          ?`<br>Mission ${nextMission.number} available.`
+          :"<br><b>CAMPAIGN COMPLETE</b>"}
+      </p>
+
+      <button onclick="window.returnHome()">
+        Return to Dojo
+      </button>
+    `);
+  }
+
+};
+
+
+/* ============================================================
+   DISCOVERY SYSTEM
+   ============================================================ */
+
+const DiscoverySystem={
+
+  discoverTechnique(id){
+
+    const technique=TECHNIQUES[id];
+
+    if(!technique)return;
+
+    S.player.techniques[id]=true;
+
+    const mission=CampaignSystem.currentMission();
+
+    if(mission){
+      S.missions[mission.id].discovery=true;
+    }
+
+    if(!S.codex.entries.includes(id)){
+      S.codex.entries.push(id);
+    }
+
+    SaveSystem.persist(S);
+
+    open(`
+      <h2>STORM TECHNIQUE DISCOVERED</h2>
+
+      <p>
+        <b>${technique.name}</b>
+        · ${technique.force}
+      </p>
+
+      <p>${technique.role}</p>
+
+      <p class="green">
+        The technique is now available.
+      </p>
+
+      <button onclick="window.closeModal()">
+        Continue
+      </button>
+    `);
+  }
+
+};
+
+
+/* ============================================================
+   SCOUTER
+   ============================================================ */
+
+const ScouterSystem={
+
+  onTechniqueResolved(result){
+
+    if(!result.techniqueId){
+      return;
+    }
+
+    const id=result.techniqueId;
+
+    const record=
+      S.scouter.techniques[id] ??
+      {
+        attempts:0,
+        successes:0,
+        energySpent:0,
+        bestReactionMs:null,
+        deflections:0,
+        traversals:0
+      };
+
+    record.attempts++;
+
+    if(result.success){
+      record.successes++;
+    }
+
+    record.energySpent+=
+      result.energySpent||0;
+
+    const reaction=
+      result.timing?.reactionMs;
+
+    if(
+      Number.isFinite(reaction) &&
+      (
+        record.bestReactionMs===null ||
+        reaction<record.bestReactionMs
+      )
+    ){
+      record.bestReactionMs=reaction;
+    }
+
+    if(
+      result.interaction?.tags?.includes(
+        "deflection"
+      )
+    ){
+      record.deflections++;
+    }
+
+    if(
+      result.collisionResult?.crossedTraversalGate
+    ){
+      record.traversals++;
+    }
+
+    S.scouter.techniques[id]=record;
+
+    SaveSystem.persist(S);
+  },
+
+
+  onEnemyDefeated(){
+    S.scouter.kills++;
+    SaveSystem.persist(S);
+  },
+
+
+  onProjectileDeflected(){
+    S.scouter.deflections++;
+    SaveSystem.persist(S);
+  },
+
+
+  onTraversal(){
+    S.scouter.traversals++;
+    SaveSystem.persist(S);
+  }
+
+};
+
+
+/* ============================================================
+   CODEX
+   ============================================================ */
+
+const CodexSystem={
+
+  onTechniqueResolved(result){
+
+    if(
+      result.success &&
+      result.techniqueId &&
+      !S.codex.entries.includes(result.techniqueId)
+    ){
+
+      S.codex.entries.push(
+        result.techniqueId
+      );
+
+      SaveSystem.persist(S);
+    }
+  },
+
+
+  onEnemyDefeated(result){
+
+    const id=`enemy:${result.enemyType}`;
+
+    if(!S.codex.entries.includes(id)){
+
+      S.codex.entries.push(id);
+
+      SaveSystem.persist(S);
+    }
+  }
+};
+
+
+/* ============================================================
+   T-CHAMBER
+   ============================================================ */
+
+const TChamberSystem={
+
+  activeTechnique:null,
+
+  onTechniqueResolved(result){
+
+    if(
+      runtimeState.scene!=="training" ||
+      !result.techniqueId
+    ){
+      return;
+    }
+
+    const id=result.techniqueId;
+
+    if(
+      id!==this.activeTechnique
+    ){
+      return;
+    }
+
+    const current=
+      Number(S.drills[id]||0);
+
+    if(result.success){
+
+      S.drills[id]=current+1;
+
+      SaveSystem.persist(S);
+
+      say(
+        `T-CHAMBER — ${TECHNIQUES[id].name} result recorded.`
+      );
+    }
+  },
+
+
+  enter(id){
+
+    if(!S.dojo.tChamberUnlocked){
+      say("T-CHAMBER LOCKED — complete Valley Gate.");
+      return;
+    }
+
+    if(!S.player.techniques[id]){
+      say("Technique is not yet available.");
+      return;
+    }
+
+    this.activeTechnique=id;
+
+    runtimeState.scene="training";
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    runtimeState.player.x=W*.5;
+    runtimeState.player.y=H*.55;
+
+    closeModal();
+
+    say(
+      `T-CHAMBER — Practice ${TECHNIQUES[id].name}.`
+    );
+  },
+
+
+  exit(){
+
+    this.activeTechnique=null;
+
+    returnHome();
+  }
+
+};
+
+
+/* ============================================================
+   EFFECTS
+   ============================================================ */
+
+const EffectsSystem={
+
+  particles:[],
+
+  emitBurst(x,y,color,count){
+
+    /*
+     Effects are disposable presentation state.
+     They never influence simulation.
+    */
+
+    for(let i=0;i<count;i++){
+
+      const angle=Math.random()*Math.PI*2;
+      const velocity=45+Math.random()*140;
+
+      this.particles.push({
+
+        x,
+        y,
+
+        vx:Math.cos(angle)*velocity,
+        vy:Math.sin(angle)*velocity,
+
+        life:.25+Math.random()*.45,
+
+        radius:2+Math.random()*3,
+
+        color
+      });
+    }
+  },
+
+
+  onTechniqueResolved(){},
+  onEnemyDefeated(){},
+  onProjectileDeflected(){}
+};
+
+
+/* ============================================================
+   DORAEMON / RECOVERY
+   ============================================================ */
+
+const DoraemonSystem={
+
+  paused:false,
+
+
+  pause(reason){
+
+    if(this.paused)return;
+
+    this.paused=true;
+
+    clearInput();
+
+    open(`
+      <h2>PAUSED</h2>
+
+      <p>${reason}</p>
+
+      <button onclick="window.resumeGame()">
+        Resume
+      </button>
+
+      <button class="alt"
+              onclick="window.restartCheckpoint()">
+        Restart Checkpoint
+      </button>
+
+      <button class="alt"
+              onclick="window.returnHome()">
+        Return to Dojo
+      </button>
+    `);
+  },
+
+
+  resume(){
+
+    this.paused=false;
+
+    closeModal();
+
+    lastFrameTime=performance.now();
+  },
+
+
+  commitCheckpoint(){
+
+    if(
+      runtimeState.scene==="home" ||
+      runtimeState.scene==="training"
+    ){
+      return;
+    }
+
+    S.campaign.scene=runtimeState.scene;
+
+    S.campaign.checkpoint={
+      scene:runtimeState.scene,
+
+      x:runtimeState.player.x/W,
+      y:runtimeState.player.y/H
+    };
+
+    const mission=
+      CampaignSystem.currentMission();
+
+    if(mission){
+
+      S.missions[mission.id].checkpoint={
+        phase:S.missions[mission.id].phase,
+        progress:S.missions[mission.id].progress
+      };
+    }
+
+    SaveSystem.persist(S);
+  },
+
+
+  restoreCheckpoint(){
+
+    const cp=
+      S.campaign.checkpoint||
+      {
+        scene:"home",
+        x:.5,
+        y:.55
+      };
+
+    runtimeState.scene=cp.scene;
+
+    runtimeState.player.x=cp.x*W;
+    runtimeState.player.y=cp.y*H;
+
+    runtimeState.player.hp=100;
+    runtimeState.player.energy=100;
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    WorldReconstructor.populateCurrentPhase();
+
+    say("Checkpoint restored safely.");
+
+    SaveSystem.persist(S);
+  },
+
+
+  onTechniqueResolved(result){
+
+    if(result.success){
+      SaveSystem.persist(S);
+    }
+  }
+};
+
+
+/* ============================================================
+   WORLD RECONSTRUCTOR
+   ============================================================ */
+
+const WorldReconstructor={
+
+  build(snapshot){
+
+    S=SnapshotValidator.validate(
+      clone(snapshot)
+    );
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    runtimeState.scene=
+      S.campaign.scene||"home";
+
+    runtimeState.player.x=
+      S.campaign.checkpoint.x*W;
+
+    runtimeState.player.y=
+      S.campaign.checkpoint.y*H;
+
+    runtimeState.player.hp=100;
+    runtimeState.player.energy=100;
+
+    this.populateCurrentPhase();
+  },
+
+
+  populateCurrentPhase(){
+
+    runtimeState.entities=[];
+    runtimeState.projectiles=[];
+
+    const mission=
+      CampaignSystem.currentMission();
+
+    if(!mission){
+      return;
+    }
+
+    const ms=S.missions[mission.id];
+
+    const phase=
+      mission.phases[ms.phase];
+
+    if(!phase){
+      return;
+    }
+
+
+    /*
+     Discovery phases.
+     */
+
+    if(phase.discovery){
+
+      if(
+        !ms.discovery
+      ){
+
+        /*
+         The discovery itself is content state.
+         The actual technique becomes available through
+         the authored discovery interaction below.
+        */
+
+        runtimeState.player.x=W*.48;
+        runtimeState.player.y=H*.55;
+      }
+    }
+
+
+    /*
+     Enemy objective phases.
+     */
+
+    if(
+      phase.enemyType &&
+      phase.enemyCount
+    ){
+
+      const remaining=
+        Math.max(
+          0,
+          phase.enemyCount-ms.progress
+        );
+
+      for(let i=0;i<remaining;i++){
+
+        const angle=
+          i/Math.max(1,remaining)*
+          Math.PI*2;
+
+        const radius=
+          130+
+          (i%2)*55;
+
+        spawnEnemy(
+          phase.enemyType,
+          W*.55+Math.cos(angle)*radius,
+          H*.52+Math.sin(angle)*radius
+        );
+      }
+    }
+
+
+    /*
+     Boss phases.
+     */
+
+    if(
+      phase.bossType &&
+      !ms.bossDefeated
+    ){
+
+      spawnEnemy(
+        phase.bossType,
+        W*.74,
+        H*.5,
+        {
+          boss:true
+        }
+      );
+    }
+
+
+    /*
+     Ancient Ruins projectile trial.
+    */
+
+    if(
+      phase.projectileTrial
+    ){
+
+      for(let i=0;i<8;i++){
+
+        spawnProjectile(
+          i%2===0?W*.18:W*.82,
+          H*(.22+(i%4)*.17),
+
+          i%2===0?220:-220,
+
+          0,
+
+          true,
+
+          "ruinTrap"
+        );
+      }
+    }
+  }
+
+};
+
+
+/* ============================================================
+   EVENT REGISTRATION
+   ============================================================ */
+
+EventBus.on(
+  "techniqueResolved",
+  CampaignSystem.onTechniqueResolved?.bind(CampaignSystem)
+);
+
+EventBus.on(
+  "techniqueResolved",
+  ScouterSystem.onTechniqueResolved.bind(ScouterSystem)
+);
+
+EventBus.on(
+  "techniqueResolved",
+  CodexSystem.onTechniqueResolved.bind(CodexSystem)
+);
+
+EventBus.on(
+  "techniqueResolved",
+  TChamberSystem.onTechniqueResolved.bind(TChamberSystem)
+);
+
+EventBus.on(
+  "techniqueResolved",
+  EffectsSystem.onTechniqueResolved.bind(EffectsSystem)
+);
+
+EventBus.on(
+  "techniqueResolved",
+  DoraemonSystem.onTechniqueResolved.bind(DoraemonSystem)
+);
+
+EventBus.on(
+  "enemyDefeated",
+  CampaignSystem.onEnemyDefeated.bind(CampaignSystem)
+);
+
+EventBus.on(
+  "enemyDefeated",
+  ScouterSystem.onEnemyDefeated.bind(ScouterSystem)
+);
+
+EventBus.on(
+  "enemyDefeated",
+  CodexSystem.onEnemyDefeated.bind(CodexSystem)
+);
+
+EventBus.on(
+  "enemyDefeated",
+  EffectsSystem.onEnemyDefeated.bind(EffectsSystem)
+);
+
+EventBus.on(
+  "projectileDeflected",
+  ScouterSystem.onProjectileDeflected.bind(ScouterSystem)
+);
+
+EventBus.on(
+  "projectileDeflected",
+  EffectsSystem.onProjectileDeflected.bind(EffectsSystem)
+);
+
+EventBus.on(
+  "traversalResolved",
+  CampaignSystem.onTraversalResolved.bind(CampaignSystem)
+);
+
+EventBus.on(
+  "traversalResolved",
+  ScouterSystem.onTraversal.bind(ScouterSystem)
+);
+
+EventBus.on(
+  "returnGateCrossed",
+  CampaignSystem.onReturnGateCrossed.bind(CampaignSystem)
+);
+
+EventBus.on(
+  "playerDefeated",
+  CampaignSystem.onPlayerDefeated.bind(CampaignSystem)
+);
+
+EventBus.on(
+  "playerDamaged",
+  ()=>{
+    if(runtimeState.player.hp<=0){
+      DoraemonSystem.restoreCheckpoint();
+    }
+  }
+);
+
+
+/* ============================================================
+   DOJO
+   ============================================================ */
+
+let DojoZones={};
+
+
+function resize(){
+
+  DPR=Math.min(
+    globalThis.devicePixelRatio||1,
+    2
+  );
+
+  W=innerWidth;
+  H=innerHeight;
+
+  canvas.width=W*DPR;
+  canvas.height=H*DPR;
+
+  canvas.style.width=W+"px";
+  canvas.style.height=H+"px";
+
+  ctx.setTransform(
+    DPR,0,0,DPR,0,0
+  );
+
+  DojoZones={
+
+    board:{
+      x:W*.22,
+      y:H*.28,
+      radius:35,
+      label:"MISSION BOARD"
+    },
+
+    tree:{
+      x:W*.77,
+      y:H*.28,
+      radius:35,
+      label:"TECHNIQUE TREE"
+    },
+
+    scan:{
+      x:W*.22,
+      y:H*.70,
+      radius:33,
+      label:"SCOUTER"
+    },
+
+    chamber:{
+      x:W*.77,
+      y:H*.70,
+      radius:36,
+      label:"T-CHAMBER"
+    }
+
+  };
+}
+
+addEventListener("resize",resize);
+
+resize();
+
+
+/* ============================================================
+   HOME / MISSION UI
+   ============================================================ */
+
+function say(text){
+  UI.obj.textContent=text;
+}
+
+
+function currentTechnique(){
+
+  if(runtimeState.scene==="training"){
+    return TChamberSystem.activeTechnique;
+  }
+
+  const unlocked=
+    Object.keys(TECHNIQUES)
+      .filter(id=>S.player.techniques[id]);
+
+  return unlocked.length?
+    unlocked[unlocked.length-1]:
+    null;
+}
+
+
+function openModal(html){
+
+  UI.panel.innerHTML=html;
+
+  UI.modal.classList.add("show");
+}
+
+
+function closeModal(){
+
+  UI.modal.classList.remove("show");
+}
+
+
+window.closeModal=closeModal;
+
+
+function board(){
+
+  let html="<h2>Mission Board</h2>";
+
+  for(const mission of Object.values(MISSIONS)){
+
+    const ms=S.missions[mission.id];
+
+    let stateText=
+      ms.status==="completed"
+        ?"Completed"
+        :ms.status==="active"
+          ?"Active"
+          :ms.status==="available"
+            ?"Available"
+            :"Locked";
+
+    html+=`
+      <div class="node ${
+        ms.status==="completed"||
+        ms.status==="available"
+          ?"on":"lock"
+      }">
+
+        <b>${mission.number}. ${mission.title}</b>
+
+        <br>
+
+        ${mission.problem}
+
+        <br>
+
+        <span class="${
+          ms.status==="available"||
+          ms.status==="completed"
+            ?"green":"amber"
+        }">
+          ${stateText}
+        </span>
+
+        ${
+          ms.status==="available"
+            ?`
+              <br>
+              <button
+                onclick="window.startMission('${mission.id}')">
+                Start Mission
+              </button>
+            `
+            :""
+        }
+
+      </div>
+    `;
+  }
+
+  html+=`
+    <button class="alt"
+            onclick="window.closeModal()">
+      Close
+    </button>
+  `;
+
+  openModal(html);
+}
+
+
+function tree(){
+
+  let html="<h2>Storm Skills</h2>";
+
+  for(const t of Object.values(TECHNIQUES)){
+
+    const unlocked=S.player.techniques[t.id];
+
+    const purchasable=
+      t.id==="pressureBurst" &&
+      !unlocked &&
+      S.missions.valleyGate.status==="completed" &&
+      S.player.tp>0;
+
+    html+=`
+      <div class="node ${
+        unlocked?"on":"lock"
+      }">
+
+        <b>${t.name}</b>
+        · ${t.force}
+
+        <br>
+
+        ${
+          unlocked
+            ?t.role
+            :"Locked"
+        }
+
+        ${
+          purchasable
+            ?`
+              <br>
+              <button
+                onclick="window.unlockPressure()">
+                Learn · 1 TP
+              </button>
+            `
+            :""
+        }
+
+      </div>
+    `;
+  }
+
+  html+=`
+    <button class="alt"
+            onclick="window.closeModal()">
+      Close
+    </button>
+  `;
+
+  openModal(html);
+}
+
+
+window.unlockPressure=()=>{
+
+  if(
+    S.missions.valleyGate.status!=="completed"||
+    S.player.techniques.pressureBurst||
+    S.player.tp<1
+  ){
+    return;
+  }
+
+  S.player.tp--;
+
+  S.player.techniques.pressureBurst=true;
+
+  SaveSystem.persist(S);
+
+  tree();
+};
+
+
+function scan(){
+
+  let html=`
+    <h2>Scouter Records</h2>
+
+    <p>
+      Kills: ${S.scouter.kills}<br>
+      Deflections: ${S.scouter.deflections}<br>
+      Traversals: ${S.scouter.traversals}
+    </p>
+  `;
+
+  for(const [id,r] of Object.entries(
+    S.scouter.techniques
+  )){
+
+    const successRate=
+      r.attempts?
+        Math.round(
+          r.successes/r.attempts*100
+        ):
+        0;
+
+    const avgEnergy=
+      r.attempts?
+        Math.round(
+          r.energySpent/r.attempts
+        ):
+        0;
+
+    html+=`
+      <div class="node">
+
+        <b>${TECHNIQUES[id]?.name||id}</b>
+
+        <br>
+
+        Attempts ${r.attempts}
+        · Success ${successRate}%
+
+        <br>
+
+        Avg energy ${avgEnergy}
+
+        ${
+          r.bestReactionMs!==null
+            ?` · Best reaction ${Math.round(r.bestReactionMs)}ms`
+            :""
+        }
+
+        ${
+          r.deflections
+            ?`<br>Deflections ${r.deflections}`
+            :""
+        }
+
+        ${
+          r.traversals
+            ?`<br>Traversals ${r.traversals}`
+            :""
+        }
+
+      </div>
+    `;
+  }
+
+  html+=`
+    <button class="alt"
+            onclick="window.closeModal()">
+      Close
+    </button>
+  `;
+
+  openModal(html);
+}
+
+
+function chamber(){
+
+  if(!S.dojo.tChamberUnlocked){
+
+    say(
+      "T-CHAMBER LOCKED — complete Valley Gate."
+    );
+
+    return;
+  }
+
+  let html=`
+    <h2>T-Chamber</h2>
+
+    <p>
+      Training evaluates genuine engine results.
+      Ending a session never removes campaign progress.
+    </p>
+  `;
+
+  for(const t of Object.values(TECHNIQUES)){
+
+    if(!S.player.techniques[t.id]){
+      continue;
+    }
+
+    const count=
+      Number(S.drills[t.id]||0);
+
+    html+=`
+      <div class="node on">
+
+        <b>${t.name}</b>
+
+        <br>
+
+        ${t.role}
+
+        <br>
+
+        Recorded successes:
+        ${count}
+
+        <br>
+
+        <button
+          onclick="window.train('${t.id}')">
+          Practice
+        </button>
+
+      </div>
+    `;
+  }
+
+  html+=`
+    <button class="alt"
+            onclick="window.closeModal()">
+      Close
+    </button>
+  `;
+
+  openModal(html);
+}
+
+
+window.train=id=>{
+  TChamberSystem.enter(id);
+};
+
+
+function interactDojo(id){
+
+  if(id==="board")board();
+  if(id==="tree")tree();
+  if(id==="scan")scan();
+  if(id==="chamber")chamber();
+}
+
+
+/* ============================================================
+   RETURN HOME
+   ============================================================ */
+
+function returnHome(){
+
+  closeModal();
+
+  runtimeState.scene="home";
+
+  runtimeState.entities=[];
+  runtimeState.projectiles=[];
+
+  S.campaign.currentMissionId=null;
+
+  runtimeState.player.x=W*.5;
+  runtimeState.player.y=H*.54;
+
+  runtimeState.player.hp=100;
+  runtimeState.player.energy=100;
+
+  TChamberSystem.activeTechnique=null;
+
+  SaveSystem.persist(S);
+
+  say(
+    "HOME DOJO — Select a mission, inspect Storm skills, or train."
+  );
+}
+
+window.returnHome=returnHome;
+
+
+/* ============================================================
+   MISSION START
+   ============================================================ */
+
+window.startMission=id=>{
+
+  CampaignSystem.startMission(id);
+};
+
+
+/* ============================================================
+   PAUSE / RECOVERY
+   ============================================================ */
+
+window.resumeGame=()=>{
+  DoraemonSystem.resume();
+};
+
+
+window.restartCheckpoint=()=>{
+
+  closeModal();
+
+  DoraemonSystem.paused=false;
+
+  DoraemonSystem.restoreCheckpoint();
+
+  lastFrameTime=performance.now();
+};
+
+
+function clearInput(){
+
+  keys={};
+
+  joystick.x=0;
+  joystick.y=0;
+  joystick.active=false;
+
+  knob.style.transform="";
+}
+
+
+/* ============================================================
+   INPUT ADAPTERS
+   ============================================================ */
+
+let keys={};
+
+let joystick={
+  x:0,
+  y:0,
+  active:false
+};
+
+const stick=$("#stick");
+const knob=$("#knob");
+
+
+function updateStick(event){
+
+  const rect=
+    stick.getBoundingClientRect();
+
+  let dx=
+    event.clientX-
+    (rect.left+rect.width/2);
+
+  let dy=
+    event.clientY-
+    (rect.top+rect.height/2);
+
+  const max=39;
+
+  const len=Math.hypot(dx,dy);
+
+  if(len>max){
+
+    dx=dx/len*max;
+    dy=dy/len*max;
+  }
+
+  joystick.x=dx/max;
+  joystick.y=dy/max;
+
+  knob.style.transform=
+    `translate(${dx}px,${dy}px)`;
+}
+
+
+stick.onpointerdown=e=>{
+
+  e.preventDefault();
+
+  joystick.active=true;
+
+  stick.setPointerCapture(
+    e.pointerId
+  );
+
+  updateStick(e);
+};
+
+
+stick.onpointermove=e=>{
+
+  if(
+    joystick.active
+  ){
+    updateStick(e);
+  }
+};
+
+
+function releaseStick(){
+
+  joystick.active=false;
+
+  joystick.x=0;
+  joystick.y=0;
+
+  knob.style.transform="";
+}
+
+
+stick.onpointerup=releaseStick;
+stick.onpointercancel=releaseStick;
+
+
+/*
+ Touch adapter → Input Router.
+ */
+
+function submit(type,extra={}){
+
+  InputRouter.submit({
+
+    type,
+
+    source:"touch",
+
+    ...extra
+  });
+}
+
+
+$("#atk").onpointerdown=e=>{
+  e.preventDefault();
+
+  submit("attack");
+};
+
+
+$("#dash").onpointerdown=e=>{
+  e.preventDefault();
+
+  submit("dash");
+};
+
+
+$("#tech").onpointerdown=e=>{
+  e.preventDefault();
+
+  const id=currentTechnique();
+
+  if(id){
+    submit(
+      "useTechnique",
+      {
+        techniqueId:id
+      }
+    );
+  }
+};
+
+
+/*
+ Keyboard adapter → same Input Router.
+ */
+
+addEventListener(
+  "keydown",
+  e=>{
+
+    const key=e.key.toLowerCase();
+
+    keys[key]=true;
+
+    if(
+      key===" " ||
+      key==="enter"
+    ){
+
+      e.preventDefault();
+
+      submit(
+        "attack",
+        {source:"keyboard"}
+      );
+    }
+
+    if(key==="shift"){
+
+      submit(
+        "dash",
+        {source:"keyboard"}
+      );
+    }
+
+    if(
+      ["1","2","3","4","5","6"]
+        .includes(key)
+    ){
+
+      const index=
+        Number(key)-1;
+
+      const ids=
+        Object.keys(TECHNIQUES);
+
+      const id=ids[index];
+
+      if(
+        id &&
+        S.player.techniques[id]
+      ){
+
+        submit(
+          "useTechnique",
+          {
+            source:"keyboard",
+            techniqueId:id
+          }
+        );
+      }
+    }
+
+    if(key==="e"){
+
+      submit(
+        "interact",
+        {source:"keyboard"}
+      );
+    }
+  }
+);
+
+
+addEventListener(
+  "keyup",
+  e=>{
+    keys[e.key.toLowerCase()]=false;
+  }
+);
+
+
+/*
+ Visibility / focus interruption.
+ */
+
+document.addEventListener(
+  "visibilitychange",
+  ()=>{
+
+    if(
+      document.hidden &&
+      !DoraemonSystem.paused
+    ){
+
+      DoraemonSystem.pause(
+        "App interrupted. Simulation paused safely."
+      );
+    }
+  }
+);
+
+
+addEventListener(
+  "blur",
+  ()=>{
+
+    if(
+      !DoraemonSystem.paused
+    ){
+
+      DoraemonSystem.pause(
+        "Focus lost. Simulation paused safely."
+      );
+    }
+  }
+);
+
+
+/* ============================================================
+   MENU
+   ============================================================ */
+
+$("#menu").onclick=()=>{
+
+  openModal(`
+    <h2>Storm Chronicles V3</h2>
+
+    <p>
+      One runtime.
+      One T-Engine simulation authority.
+      Immutable results.
+      Validated recovery.
+    </p>
+
+    <p class="tiny">
+      Input → Request → Validation → T-Engine →
+      Result → Event Bus → Consumers → Snapshot.
+    </p>
+
+    <button onclick="window.pauseNow()">
+      Pause
+    </button>
+
+    <button
+      class="danger"
+      onclick="window.resetV3()">
+      Reset V3 Save
+    </button>
+
+    <button
+      class="alt"
+      onclick="window.closeModal()">
+      Close
+    </button>
+  `);
+};
+
+
+window.pauseNow=()=>{
+
+  DoraemonSystem.pause(
+    "Manual pause."
+  );
+};
+
+
+window.resetV3=()=>{
+
+  localStorage.removeItem(
+    SAVE_KEY
+  );
+
+  location.reload();
+};
+
+
+/* ============================================================
+   HOME INTERACTION
+   ============================================================ */
+
+function homeInteraction(){
+
+  if(
+    runtimeState.scene!=="home"
+  ){
+    return;
+  }
+
+  for(
+    const [id,z] of Object.entries(DojoZones)
+  ){
+
+    if(
+      Math.hypot(
+        runtimeState.player.x-z.x,
+        runtimeState.player.y-z.y
+      )<
+      z.radius+18
+    ){
+
+      say(
+        `${z.label} — press E or tap.`
+      );
+    }
+  }
+}
+
+
+canvas.onpointerdown=e=>{
+
+  if(
+    runtimeState.scene!=="home"
+  ){
+    return;
+  }
+
+  for(
+    const [id,z] of Object.entries(DojoZones)
+  ){
+
+    if(
+      Math.hypot(
+        e.clientX-z.x,
+        e.clientY-z.y
+      )<
+      z.radius+22
+    ){
+
+      InputRouter.submit({
+        type:"interact",
+        target:id,
+        source:"touch"
+      });
+
+      /*
+       Target is interpreted only by the home UI adapter.
+       It does not modify physical state.
+      */
+
+      interactDojo(id);
+
+      return;
+    }
+  }
+};
+
+
+/* ============================================================
+   DISCOVERY / PHASE INTERACTIONS
+   ============================================================ */
+
+canvas.addEventListener(
+  "pointerdown",
+  e=>{
+
+    const mission=
+      CampaignSystem.currentMission();
+
+    if(!mission)return;
+
+    const ms=S.missions[mission.id];
+
+    const phase=
+      mission.phases[ms.phase];
+
+    if(
+      !phase?.discovery
+    ){
+      return;
+    }
+
+    if(
+      Math.hypot(
+        runtimeState.player.x-e.clientX,
+        runtimeState.player.y-e.clientY
+      )<85
+    ){
+
+      DiscoverySystem.discoverTechnique(
+        phase.discovery
+      );
+
+      ms.phase=phase.next;
+
+      ms.progress=0;
+
+      WorldReconstructor.populateCurrentPhase();
+
+      DoraemonSystem.commitCheckpoint();
+
+      updateObjective();
+    }
+  }
+);
+
+
+/* ============================================================
+   OBJECTIVE DISPLAY
+   ============================================================ */
+
+function updateObjective(){
+
+  if(
+    runtimeState.scene==="home"
+  ){
+
+    say(
+      "HOME DOJO — Select a mission, inspect Storm skills, or train."
+    );
+
+    return;
+  }
+
+  if(
+    runtimeState.scene==="training"
+  ){
+
+    const id=
+      TChamberSystem.activeTechnique;
+
+    say(
+      id
+        ?`T-CHAMBER — Use ${TECHNIQUES[id].name}.`
+        :"T-CHAMBER"
+    );
+
+    return;
+  }
+
+  const mission=
+    CampaignSystem.currentMission();
+
+  if(!mission)return;
+
+  const ms=S.missions[mission.id];
+
+  const phase=
+    mission.phases[ms.phase];
+
+  if(!phase)return;
+
+  say(
+    `MISSION ${mission.number} — ${phase.objective}`
+  );
+}
+
+
+/* ============================================================
+   PHYSICAL INPUT UPDATE
+   ============================================================ */
+
+function buildMoveRequest(){
+
+  let x=joystick.x;
+  let y=joystick.y;
+
+  if(keys.w||keys.arrowup)y-=1;
+  if(keys.s||keys.arrowdown)y+=1;
+  if(keys.a||keys.arrowleft)x-=1;
+  if(keys.d||keys.arrowright)x+=1;
+
+  const len=Math.hypot(x,y);
+
+  if(len>1){
+    x/=len;
+    y/=len;
+  }
+
+  return {
+    x,
+    y
+  };
+}
+
+
+/* ============================================================
+   HUD
+   ============================================================ */
+
+function updateHUD(){
+
+  UI.lv.textContent=S.player.level;
+  UI.pw.textContent=S.player.power;
+  UI.xp.textContent=S.player.xp;
+  UI.need.textContent=S.player.level*250;
+  UI.tp.textContent=S.player.tp;
+
+  UI.hp.style.width=
+    `${Math.max(
+      0,
+      runtimeState.player.hp
+    )}%`;
+
+  UI.en.style.width=
+    `${Math.max(
+      0,
+      runtimeState.player.energy
+    )}%`;
+
+  UI.hpt.textContent=
+    Math.ceil(runtimeState.player.hp);
+
+  UI.ent.textContent=
+    Math.ceil(runtimeState.player.energy);
+
+
+  if(
+    runtimeState.scene==="home"
+  ){
+
+    UI.region.textContent="HOME DOJO";
+    UI.phase.textContent="READY";
+
+    UI.stat.textContent=
+      `Kills ${S.scouter.kills}`;
+
+    return;
+  }
+
+
+  if(
+    runtimeState.scene==="training"
+  ){
+
+    UI.region.textContent="T-CHAMBER";
+    UI.phase.textContent="TRAINING";
+
+    const id=
+      TChamberSystem.activeTechnique;
+
+    UI.stat.textContent=
+      id
+        ?`Results ${S.drills[id]||0}`
+        :"—";
+
+    return;
+  }
+
+
+  const mission=
+    CampaignSystem.currentMission();
+
+  if(!mission)return;
+
+  const ms=S.missions[mission.id];
+
+  UI.region.textContent=
+    mission.title;
+
+  UI.phase.textContent=
+    ms.phase.toUpperCase();
+
+  UI.stat.textContent=
+    `Progress ${ms.progress}`;
+}
+
+
+/* ============================================================
+   RENDERING
+   Rendering cannot determine game truth.
+   ============================================================ */
+
+function circle(
+  x,y,r,fill,stroke=null
+){
+
+  ctx.fillStyle=fill;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,y,r,0,Math.PI*2
+  );
+
+  ctx.fill();
+
+  if(stroke){
+
+    ctx.strokeStyle=stroke;
+    ctx.lineWidth=2;
+
+    ctx.stroke();
+  }
+}
+
+
+function render(){
+
+  let palette;
+
+  if(
+    runtimeState.scene==="home"
+  ){
+
+    palette=REGIONS.valley.palette;
+
+  }else if(
+    runtimeState.scene==="training"
+  ){
+
+    palette=["#20395c","#091426"];
+
+  }else{
+
+    const mission=
+      CampaignSystem.currentMission();
+
+    palette=
+      REGIONS[
+        mission?.regionId||"valley"
+      ].palette;
+  }
+
+
+  const bg=
+    ctx.createLinearGradient(
+      0,0,0,H
+    );
+
+  bg.addColorStop(
+    0,
+    palette[0]
+  );
+
+  bg.addColorStop(
+    1,
+    palette[1]
+  );
+
+  ctx.fillStyle=bg;
+
+  ctx.fillRect(
+    0,0,W,H
+  );
+
+
+  ctx.textAlign="center";
+
+
+  if(
+    runtimeState.scene==="home"
+  ){
+
+    ctx.fillStyle="#bdf0ff";
+    ctx.font="900 18px system-ui";
+
+    ctx.fillText(
+      "HOME DOJO",
+      W/2,
+      63
+    );
+
+
+    for(
+      const [id,z] of Object.entries(DojoZones)
+    ){
+
+      const locked=
+        id==="chamber" &&
+        !S.dojo.tChamberUnlocked;
+
+      circle(
+        z.x,
+        z.y,
+        z.radius,
+        locked
+          ?"rgba(63,72,82,.8)"
+          :"rgba(22,126,138,.9)",
+        "#b9f7ff"
+      );
+
+      ctx.fillStyle=
+        locked
+          ?" #bdc3ca"
+          :"#efffff";
+
+      ctx.font="bold 9px system-ui";
+
+      ctx.fillText(
+        locked
+          ?"T-CHAMBER LOCKED"
+          :z.label,
+        z.x,
+        z.y+3
+      );
+    }
+
+  }else{
+
+    const mission=
+      CampaignSystem.currentMission();
+
+    ctx.fillStyle="#fff0bd";
+    ctx.font="900 16px system-ui";
+
+    ctx.fillText(
+      runtimeState.scene==="training"
+        ?"T-CHAMBER"
+        :mission?.title||"MISSION",
+      W/2,
+      62
+    );
+
+
+    /*
+     Forest bridge visual.
+    */
+
+    if(
+      runtimeState.scene==="forestBridge"
+    ){
+
+      ctx.fillStyle="#26363c";
+
+      ctx.fillRect(
+        W*.40,
+        H*.42,
+        W*.20,
+        H*.18
+      );
+
+      ctx.fillStyle="#bdf4ff";
+      ctx.font="bold 10px system-ui";
+
+      ctx.fillText(
+        "JUMP → AIR STEP",
+        W/2,
+        H*.37
+      );
+    }
+
+
+    /*
+     West return route.
+    */
+
+    if(mission){
+
+      const ms=S.missions[mission.id];
+
+      const phase=
+        mission.phases[ms.phase];
+
+      if(
+        phase?.returnGate==="west"
+      ){
+
+        ctx.fillStyle="#8dffcf";
+
+        ctx.fillRect(
+          0,
+          H*.40,
+          17,
+          H*.20
+        );
+
+        ctx.fillStyle="#8dffcf";
+        ctx.font="bold 10px system-ui";
+
+        ctx.fillText(
+          "WEST RETURN ←",
+          75,
+          H*.35
+        );
+      }
+    }
+
+
+    /*
+     Ancient projectile hall marker.
+    */
+
+    if(
+      mission?.id==="ancientRuins" &&
+      S.missions.ancientRuins.phase==="volley"
+    ){
+
+      ctx.fillStyle="#ffd27c";
+      ctx.font="bold 10px system-ui";
+
+      ctx.fillText(
+        "PROJECTILE HALL",
+        W/2,
+        H*.22
+      );
+    }
+  }
+
+
+  /*
+   Projectiles.
+  */
+
+  for(
+    const projectile of runtimeState.projectiles
+  ){
+
+    circle(
+      projectile.x,
+      projectile.y,
+      projectile.radius,
+      projectile.enemy
+        ?"#ff85bd"
+        :"#5ceaff"
+    );
+  }
+
+
+  /*
+   Enemies.
+  */
+
+  for(
+    const e of runtimeState.entities
+  ){
+
+    circle(
+      e.x,
+      e.y,
+      e.radius,
+      e.hitTimer>0
+        ?"#fff"
+        :e.color
+    );
+
+
+    /*
+     HP.
+    */
+
+    ctx.fillStyle="#19172e";
+
+    ctx.fillRect(
+      e.x-e.radius,
+      e.y-e.radius-11,
+      e.radius*2,
+      4
+    );
+
+    ctx.fillStyle="#83f8c7";
+
+    ctx.fillRect(
+      e.x-e.radius,
+      e.y-e.radius-11,
+      e.radius*2*
+        Math.max(
+          0,
+          e.hp/e.maxHp
+        ),
+      4
+    );
+
+
+    /*
+     Stability.
+    */
+
+    if(e.stability<e.maxStability){
+
+      ctx.fillStyle="#ffd46a";
+
+      ctx.fillRect(
+        e.x-e.radius,
+        e.y-e.radius-16,
+        e.radius*2*
+          Math.max(
+            0,
+            e.stability/e.maxStability
+          ),
+        2
+      );
+    }
+  }
+
+
+  /*
+   Effects.
+  */
+
+  for(
+    const f of EffectsSystem.particles
+  ){
+
+    ctx.globalAlpha=
+      Math.max(
+        0,
+        f.life*1.8
+      );
+
+    circle(
+      f.x,
+      f.y,
+      f.radius,
+      f.color
+    );
+
+    ctx.globalAlpha=1;
+  }
+
+
+  /*
+   Player.
+  */
+
+  const p=runtimeState.player;
+
+  circle(
+    p.x,
+    p.y,
+    p.radius,
+    p.invulnerable>0
+      ?"white"
+      :p.guardTimer>0
+        ?" #a3ffe4"
+        :"#63eaff",
+    "#e8ffff"
+  );
+
+
+  ctx.strokeStyle="#efffff";
+  ctx.lineWidth=3;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    p.x+p.dx*10,
+    p.y+p.dy*10
+  );
+
+  ctx.lineTo(
+    p.x+p.dx*25,
+    p.y+p.dy*25
+  );
+
+  ctx.stroke();
+}
+
+
+/* ============================================================
+   EFFECT UPDATE
+   Presentation only.
+   ============================================================ */
+
+function updateEffects(dt){
+
+  for(
+    let i=EffectsSystem.particles.length-1;
+    i>=0;
+    i--
+  ){
+
+    const f=
+      EffectsSystem.particles[i];
+
+    f.x+=f.vx*dt;
+    f.y+=f.vy*dt;
+
+    f.vx*=.90;
+    f.vy*=.90;
+
+    f.life-=dt;
+
+    if(f.life<=0){
+      EffectsSystem.particles.splice(i,1);
+    }
+  }
+}
+
+
+/* ============================================================
+   DEVELOPMENT ARCHITECTURE TEST
+   ============================================================ */
+
+const RuntimeDiagnostics={
+
+  enabled:true,
+
+  removalTest(){
+
+    /*
+     This intentionally tests interfaces rather than
+     deleting global objects during live play.
+
+     Physical truth is held only by TEngine/runtimeState.
+    */
+
+    return {
+
+      effects:
+        "removable — presentation only",
+
+      scouter:
+        "removable — measurement only",
+
+      codex:
+        "removable — knowledge only",
+
+      tChamber:
+        "removable — training only",
+
+      touch:
+        "adapter only",
+
+      keyboard:
+        "adapter only",
+
+      doraemon:
+        "recovery only",
+
+      tEngine:
+        "required — physical authority"
+    };
+  }
+};
+
+window.StormRuntime={
+  processRequest,
+  InputRouter,
+  Validator,
+  TEngine,
+  EventBus,
+  SaveSystem,
+  SnapshotValidator,
+  WorldReconstructor,
+  RuntimeDiagnostics
+};
+
+
+/* ============================================================
+   FRAME LOOP
+   ============================================================ */
+
+let lastFrameTime=performance.now();
+
+
+function frame(timestamp){
+
+  let dt=
+    Math.min(
+      .035,
+      (timestamp-lastFrameTime)/1000
+    );
+
+  lastFrameTime=timestamp;
+
+  if(!DoraemonSystem.paused){
+
+    /*
+     Movement intent enters through the same request
+     boundary as attack/technique/dash.
+    */
+
+    const move=
+      buildMoveRequest();
+
+    if(
+      Math.hypot(move.x,move.y)>0
+    ){
+
+      InputRouter.submit({
+
+        type:"move",
+
+        direction:move,
+
+        source:
+          joystick.active
+            ?"touch"
+            :"keyboard"
+      });
+    }
+
+
+    /*
+     Every queued command goes through exactly one
+     validation → T-Engine → immutable result path.
+    */
+
+    while(RequestQueue.length){
+
+      const request=
+        RequestQueue.shift();
+
+      processRequest(
+        request,
+        dt
+      );
+    }
+
+
+    /*
+     Continuous world simulation remains inside T-Engine.
+    */
+
+    TEngine.tick(dt);
+
+    updateEffects(dt);
+
+    updateObjective();
+
+    updateHUD();
+  }
+
+
+  render();
+
+  requestAnimationFrame(frame);
+}
+
+
+/* ============================================================
+   INITIAL RECONSTRUCTION
+   ============================================================ */
+
+WorldReconstructor.build(S);
+
+if(
+  runtimeState.scene==="home"
+){
+
+  runtimeState.player.x=W*.5;
+  runtimeState.player.y=H*.54;
+}
+
+updateObjective();
+updateHUD();
+
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body>
+</html>
